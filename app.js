@@ -129,17 +129,321 @@ function toggleNumber(n){
 
 function drawLottery(){
   if(state.selected.length!==6)return;
+
   const btn=document.getElementById("drawBtn");
-  btn.disabled=true;
-  btn.textContent=t("drawing");
   const area=document.getElementById("drawArea");
-  area.innerHTML="";
+
+  if(!btn || !area)return;
+
+  btn.disabled=true;
+  btn.style.display="none";
+
+  /* Add the draw animation styling */
+  if(!document.getElementById("lottery-draw-animation-style")){
+    const style=document.createElement("style");
+    style.id="lottery-draw-animation-style";
+
+    style.textContent=`
+      .lottery-draw-stage{
+        margin:24px auto 10px;
+        padding:22px 12px 18px;
+        background:#ffffff;
+        border:2px solid #222;
+        border-radius:16px;
+        text-align:center;
+        overflow:hidden;
+      }
+
+      .lottery-draw-title{
+        font-size:13px;
+        font-weight:900;
+        letter-spacing:.08em;
+        margin-bottom:18px;
+        color:#222;
+      }
+
+      .lottery-machine{
+        width:150px;
+        height:92px;
+        margin:0 auto 22px;
+        border:4px solid #222;
+        border-radius:80px 80px 20px 20px;
+        background:
+          radial-gradient(
+            circle at 50% 30%,
+            #ffffff 0%,
+            #f5f5f5 55%,
+            #d9d9d9 100%
+          );
+        position:relative;
+        box-shadow:
+          inset 0 -9px 0 rgba(0,0,0,.08),
+          0 4px 0 rgba(0,0,0,.12);
+      }
+
+      .lottery-machine:before{
+        content:"";
+        position:absolute;
+        width:80px;
+        height:15px;
+        left:50%;
+        top:14px;
+        transform:translateX(-50%);
+        border-radius:50%;
+        background:rgba(255,255,255,.8);
+      }
+
+      .machine-window{
+        position:absolute;
+        left:50%;
+        bottom:-18px;
+        transform:translateX(-50%);
+        width:48px;
+        height:42px;
+        border:4px solid #222;
+        border-radius:8px 8px 18px 18px;
+        background:#fff;
+      }
+
+      .machine-window:after{
+        content:"";
+        position:absolute;
+        left:50%;
+        top:-15px;
+        transform:translateX(-50%);
+        width:13px;
+        height:13px;
+        background:#222;
+        border-radius:50%;
+      }
+
+      .draw-ball-row{
+        min-height:68px;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        gap:8px;
+        flex-wrap:wrap;
+        padding-top:4px;
+      }
+
+      .draw-ball-animated{
+        width:50px;
+        height:50px;
+        min-width:50px;
+        border-radius:50%;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+
+        font-size:18px;
+        font-weight:900;
+        color:#111;
+
+        border:3px solid rgba(0,0,0,.35);
+
+        box-shadow:
+          0 5px 0 rgba(0,0,0,.18),
+          inset 3px 3px 8px rgba(255,255,255,.75);
+
+        animation:
+          lotteryBallIn .7s cubic-bezier(.2,.9,.25,1.3) both;
+      }
+
+      .draw-ball-animated.yellow{
+        background:#f4d35e;
+      }
+
+      .draw-ball-animated.blue{
+        background:#4c8eda;
+        color:white;
+      }
+
+      .draw-ball-animated.red{
+        background:#e74c3c;
+        color:white;
+      }
+
+      .draw-ball-animated.gray{
+        background:#b9b9b9;
+      }
+
+      .draw-ball-animated.green{
+        background:#58b957;
+        color:white;
+      }
+
+      .draw-ball-animated.latest{
+        animation:
+          lotteryBallIn .7s cubic-bezier(.2,.9,.25,1.3) both,
+          lotteryBallPulse .55s ease-out .7s;
+      }
+
+      .draw-status{
+        margin-top:14px;
+        font-size:12px;
+        font-weight:800;
+        letter-spacing:.05em;
+        color:#555;
+      }
+
+      @keyframes lotteryBallIn{
+        0%{
+          opacity:0;
+          transform:
+            translateY(-70px)
+            scale(.35)
+            rotate(-25deg);
+        }
+
+        55%{
+          opacity:1;
+          transform:
+            translateY(10px)
+            scale(1.08)
+            rotate(8deg);
+        }
+
+        78%{
+          transform:
+            translateY(-5px)
+            scale(.96)
+            rotate(-3deg);
+        }
+
+        100%{
+          opacity:1;
+          transform:
+            translateY(0)
+            scale(1)
+            rotate(0);
+        }
+      }
+
+      @keyframes lotteryBallPulse{
+        0%{
+          transform:scale(1);
+        }
+
+        50%{
+          transform:scale(1.15);
+        }
+
+        100%{
+          transform:scale(1);
+        }
+      }
+
+      @media(max-width:480px){
+
+        .lottery-draw-stage{
+          padding:18px 7px 15px;
+        }
+
+        .lottery-machine{
+          width:130px;
+          height:78px;
+        }
+
+        .draw-ball-row{
+          gap:6px;
+        }
+
+        .draw-ball-animated{
+          width:45px;
+          height:45px;
+          min-width:45px;
+          font-size:16px;
+        }
+      }
+
+      @media(prefers-reduced-motion:reduce){
+
+        .draw-ball-animated{
+          animation:none !important;
+          opacity:1;
+          transform:none;
+        }
+      }
+    `;
+
+    document.head.appendChild(style);
+  }
+
+  /* Create the lottery machine and empty ball area */
+  area.innerHTML=`
+    <div class="lottery-draw-stage">
+
+      <div class="lottery-draw-title">
+        ${state.lang==="ko" ? "나의 번호를 추첨하고 있습니다..." : "YOUR NUMBERS ARE BEING DRAWN..."}
+      </div>
+
+      <div class="lottery-machine">
+        <div class="machine-window"></div>
+      </div>
+
+      <div class="draw-ball-row" id="drawBallRow"></div>
+
+      <div class="draw-status" id="drawStatus">
+        1 / 6
+      </div>
+
+    </div>
+  `;
+
+  const row=document.getElementById("drawBallRow");
+  const status=document.getElementById("drawStatus");
+
+  /*
+    Draw the six numbers one at a time.
+    900ms between balls gives the animation enough time
+    for each number to feel like a real draw.
+  */
+
   state.selected.forEach((n,i)=>{
+
     setTimeout(()=>{
-      area.innerHTML+=`<div class="ball ${ballColor(n)} draw-ball" style="animation-delay:${i*30}ms">${n}</div>`;
-    },i*520);
+
+      const ball=document.createElement("div");
+
+      ball.className=
+        `draw-ball-animated ${ballColor(n)} latest`;
+
+      ball.textContent=n;
+
+      ball.setAttribute(
+        "aria-label",
+        `Drawn number ${n}`
+      );
+
+      row.appendChild(ball);
+
+      if(status){
+        status.textContent=`${i+1} / 6`;
+      }
+
+      /*
+        Remove the "latest" class after the entrance
+        animation so the ball settles into place.
+      */
+
+      setTimeout(()=>{
+        ball.classList.remove("latest");
+      },1200);
+
+    },i*900);
+
   });
-  setTimeout(showWin,state.selected.length*520+700);
+
+  /*
+    Wait until all six balls have appeared before
+    showing the winning screen.
+  */
+
+  setTimeout(
+    showWin,
+    state.selected.length*900 + 1300
+  );
 }
 
 function showWin(){
