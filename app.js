@@ -614,7 +614,7 @@ function drawLottery(){
 function showWin(){
   const el=document.createElement("div");
   el.className="win";
-  el.innerHTML=`<div class="win-card"><div class="eyebrow">${t("congrats")}</div><h1>${t("won")}</h1><div class="win-amount" id="winAmount">₩0</div><div class="bank-count">${t("remaining")}: <strong>₩750,000,000</strong></div><button class="primary" onclick="state.drawn=true;render()">${t("continue")}</button></div>`;
+  el.innerHTML=`<div class="win-card"><div class="eyebrow">${t("congrats")}</div><h1>${t("won")}</h1><div class="win-amount" id="winAmount">₩0</div><div class="bank-count">${t("remaining")}: <strong>₩750,000,000</strong></div><button class="primary" onclick="state.dream=false;state.drawn=true;render()">${t("continue")}</button></div>`;
   document.body.appendChild(el);
   let start=0,target=750000000,dur=2200,startTime=null;
   const tick=ts=>{
