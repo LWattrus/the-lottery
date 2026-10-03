@@ -89,8 +89,8 @@ function warningScreen(){
 
 const ballColor = n => n <= 10 ? "yellow" : n <= 20 ? "blue" : n <= 30 ? "red" : n <= 40 ? "gray" : "green";
 
-function numberBall(n, extra=""){
-  return `<button class="ball ${ballColor(n)} ${extra}" onclick="toggleNumber(${n})" aria-label="Number ${n}">${n}</button>`;
+function lottoMark(n, extra=""){
+  return `<button class="lotto-mark ${extra}" onclick="toggleNumber(${n})" aria-label="Number ${n}" aria-pressed="${extra.includes("selected") ? "true" : "false"}"><span>${n}</span></button>`;
 }
 
 function ticketScreen(){
@@ -99,16 +99,18 @@ function ticketScreen(){
     <div class="hero-main"><div class="ticket-wrap">
       <div class="eyebrow">DREAM LIFE</div>
       <h1>${t("ticket")}</h1>
-      <div class="ticket">
-        <div class="ticket-title">₩750,000,000</div>
-        <p>${t("pick")}</p>
+      <div class="ticket korean-ticket">
+        <div class="ticket-brand"><span>동행복권</span><strong>Lotto <b>6/45</b></strong></div>
+        <div class="ticket-price">₩1,000 <span>GAME</span></div>
+        <p class="ticket-instruction">${t("pick")}</p>
         <div class="selected-label">${t("lotteryReady")}: <strong>${selected.length}/6</strong></div>
-        <div class="selected-balls">
-          ${selected.map(n=>numberBall(n,"chosen")).join("") || `<span class="empty-selection">—</span>`}
+        <div class="selected-balls selected-marks">
+          ${selected.map(n=>lottoMark(n,"selected chosen")).join("") || `<span class="empty-selection">${state.lang==='ko'?'번호를 선택하세요':'Choose your numbers'}</span>`}
         </div>
-        <div class="number-grid">
-          ${Array.from({length:45},(_,i)=>i+1).map(n=>numberBall(n, selected.includes(n) ? "selected" : "")).join("")}
+        <div class="number-grid lotto-grid">
+          ${Array.from({length:45},(_,i)=>i+1).map(n=>lottoMark(n, selected.includes(n) ? "selected" : "")).join("")}
         </div>
+        <div class="ticket-bottom"><span>● ${state.lang==='ko'?'수동 선택':'MANUAL'}</span><span>${selected.length}/6</span></div>
         <div class="draw-area" id="drawArea"></div>
         <button class="draw-button" id="drawBtn" onclick="drawLottery()" ${selected.length!==6?"disabled":""}>${t("draw")}</button>
         ${selected.length!==6 ? `<div class="choose-note">${t("chooseSix")}</div>` : ""}
