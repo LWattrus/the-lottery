@@ -228,264 +228,1388 @@ button,input{font:inherit}button{cursor:pointer}
 }
 
 /* =========================================================
-   DREAM PICKER
+   LUXURY DREAM EXPERIENCE
    ========================================================= */
 
-.dream-picker{
+.luxury-dream-picker,
+.luxury-destination,
+.luxury-seoul-placeholder{
+
   min-height:100vh;
+
   background:
-    radial-gradient(circle at 50% 0%, #fff7e8 0%, #ffffff 42%),
-    #ffffff;
-  color:#111;
+    radial-gradient(
+      circle at 50% -10%,
+      #3a3328 0%,
+      #181715 38%,
+      #0b0b0a 72%,
+      #070707 100%
+    );
+
+  color:#f4efe5;
+
 }
 
-.dream-topbar{
+
+/* TOP BAR */
+
+.luxury-topbar{
+
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:18px 20px;
-  border-bottom:1px solid #e5e5e5;
-  background:rgba(255,255,255,.92);
+
+  padding:22px 28px;
+
+  border-bottom:1px solid rgba(201,169,102,.22);
+
+  background:rgba(7,7,6,.82);
+
+  backdrop-filter:blur(18px);
+
   position:sticky;
   top:0;
-  z-index:10;
+  z-index:20;
+
 }
 
-.dream-content{
-  width:min(100% - 32px, 900px);
+
+.luxury-wordmark{
+
+  font-family:"Playfair Display",Georgia,serif;
+
+  font-size:25px;
+
+  letter-spacing:.12em;
+
+  color:#e7d3a0;
+
+  font-weight:600;
+
+}
+
+
+.luxury-wordmark span{
+
+  display:block;
+
+  font-family:Arial,system-ui,sans-serif;
+
+  font-size:8px;
+
+  letter-spacing:.45em;
+
+  color:#a9956a;
+
+  margin-bottom:2px;
+
+}
+
+
+.luxury-lang-toggle{
+
+  border:1px solid rgba(201,169,102,.45);
+
+  background:transparent;
+
+  color:#d8c596;
+
+  padding:8px 14px;
+
+  border-radius:999px;
+
+  font-size:11px;
+
+  letter-spacing:.08em;
+
+}
+
+
+.luxury-lang-toggle:hover{
+
+  background:#c8a75a;
+
+  color:#111;
+
+}
+
+
+/* MAIN DREAM PAGE */
+
+.luxury-content{
+
+  width:min(1180px,calc(100% - 36px));
+
   margin:0 auto;
-  padding:45px 0 70px;
+
+  padding:72px 0 70px;
+
+}
+
+
+.luxury-content > .luxury-eyebrow{
+
   text-align:center;
+
 }
 
-.dream-content h1{
-  margin:8px 0 10px;
-  font-size:clamp(34px,7vw,64px);
-  line-height:.98;
-  letter-spacing:-.05em;
-}
 
-.dream-intro{
-  max-width:600px;
-  margin:0 auto 24px;
-  color:#666;
-  font-size:16px;
-  line-height:1.6;
-}
+.luxury-eyebrow{
 
-.dream-balance{
-  display:inline-flex;
-  flex-direction:column;
-  gap:3px;
-  padding:12px 22px;
-  margin-bottom:32px;
-  border:2px solid #111;
-  border-radius:14px;
-  background:#fff;
-  box-shadow:4px 4px 0 #111;
-}
+  color:#c8a75a;
 
-.dream-balance span{
   font-size:10px;
-  font-weight:900;
-  letter-spacing:.1em;
-  color:#777;
+
+  font-weight:700;
+
+  letter-spacing:.28em;
+
+  text-transform:uppercase;
+
 }
 
-.dream-balance strong{
-  font-size:22px;
-  letter-spacing:-.03em;
+
+.luxury-content h1{
+
+  font-family:"Playfair Display",Georgia,serif;
+
+  text-align:center;
+
+  font-size:clamp(48px,8vw,88px);
+
+  font-weight:500;
+
+  letter-spacing:-.045em;
+
+  line-height:.95;
+
+  margin:14px 0 18px;
+
+  color:#f6f0e5;
+
 }
 
-.dream-options{
-  max-width:760px;
+
+.luxury-intro{
+
+  max-width:620px;
+
   margin:0 auto;
+
+  text-align:center;
+
+  color:#aaa397;
+
+  font-size:16px;
+
+  line-height:1.7;
+
 }
 
-.dream-card{
-  text-align:left;
-  background:#fff;
-  border:2px solid #111;
-  border-radius:24px;
+
+/* FORTUNE */
+
+.fortune-display{
+
+  width:max-content;
+
+  max-width:100%;
+
+  margin:34px auto 62px;
+
+  padding:18px 36px;
+
+  text-align:center;
+
+  border-top:1px solid rgba(200,167,90,.5);
+
+  border-bottom:1px solid rgba(200,167,90,.5);
+
+}
+
+
+.fortune-display span{
+
+  display:block;
+
+  margin-bottom:7px;
+
+  color:#9d927e;
+
+  font-size:9px;
+
+  letter-spacing:.24em;
+
+  text-transform:uppercase;
+
+}
+
+
+.fortune-display strong{
+
+  font-family:"Playfair Display",Georgia,serif;
+
+  font-size:clamp(30px,5vw,48px);
+
+  font-weight:500;
+
+  letter-spacing:.02em;
+
+  color:#e4c982;
+
+}
+
+
+/* DREAM GRID */
+
+.luxury-dream-grid{
+
+  display:grid;
+
+  grid-template-columns:repeat(2,minmax(0,1fr));
+
+  gap:22px;
+
+}
+
+
+/* CARDS */
+
+.luxury-dream-card{
+
+  position:relative;
+
   overflow:hidden;
-  box-shadow:8px 8px 0 #111;
+
+  background:#121211;
+
+  border:1px solid rgba(200,167,90,.24);
+
+  transition:
+    transform .3s ease,
+    border-color .3s ease,
+    box-shadow .3s ease;
+
 }
 
-.dream-image{
-  min-height:230px;
+
+.luxury-dream-card:not(.luxury-featured){
+
+  opacity:.82;
+
+}
+
+
+.luxury-dream-card:not(.luxury-featured):hover{
+
+  opacity:1;
+
+}
+
+
+.luxury-dream-card.luxury-featured{
+
+  cursor:pointer;
+
+  border-color:rgba(200,167,90,.65);
+
+  box-shadow:
+    0 20px 70px rgba(0,0,0,.45),
+    inset 0 0 40px rgba(200,167,90,.035);
+
+}
+
+
+.luxury-dream-card.luxury-featured:hover{
+
+  transform:translateY(-5px);
+
+  border-color:#d7ba73;
+
+  box-shadow:
+    0 28px 80px rgba(0,0,0,.6),
+    0 0 35px rgba(200,167,90,.08);
+
+}
+
+
+.luxury-card-number{
+
+  position:absolute;
+
+  top:18px;
+
+  left:20px;
+
+  z-index:5;
+
+  color:#d1b66f;
+
+  font-size:10px;
+
+  letter-spacing:.2em;
+
+}
+
+
+/* CARD IMAGE */
+
+.luxury-card-image{
+
+  height:300px;
+
+  position:relative;
+
+  overflow:hidden;
+
   display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
+
+  align-items:flex-end;
+
+  padding:28px;
+
+  background-size:cover;
+
+  background-position:center;
+
+}
+
+
+/*
+  These are intentionally abstract luxury visuals rather
+  than copied photographs or brand imagery.
+*/
+
+.getaway-image{
+
+  background:
+    linear-gradient(
+      135deg,
+      #151515 0%,
+      #28251f 48%,
+      #655436 100%
+    );
+
+}
+
+
+.getaway-image:before{
+
+  content:"";
+
+  position:absolute;
+
+  width:280px;
+  height:280px;
+
+  right:-70px;
+  top:-90px;
+
+  border-radius:50%;
+
+  border:1px solid rgba(226,200,137,.35);
+
+  box-shadow:
+    0 0 0 35px rgba(226,200,137,.035),
+    0 0 0 70px rgba(226,200,137,.025);
+
+}
+
+
+.getaway-image:after{
+
+  content:"";
+
+  position:absolute;
+
+  width:180px;
+  height:180px;
+
+  left:-50px;
+  bottom:-100px;
+
+  background:#c8a75a;
+
+  border-radius:50%;
+
+  filter:blur(55px);
+
+  opacity:.18;
+
+}
+
+
+.shopping-image{
+
+  background:
+    linear-gradient(
+      135deg,
+      #191817,
+      #302d28 55%,
+      #6c5940
+    );
+
+}
+
+
+.shopping-image:before{
+
+  content:"";
+
+  position:absolute;
+
+  width:180px;
+  height:260px;
+
+  right:18%;
+
+  top:30px;
+
+  border:1px solid rgba(232,211,163,.22);
+
+  transform:rotate(9deg);
+
+}
+
+
+.home-image{
+
+  background:
+    linear-gradient(
+      135deg,
+      #161616,
+      #29261f 50%,
+      #4d4437
+    );
+
+}
+
+
+.home-image:before{
+
+  content:"";
+
+  position:absolute;
+
+  width:240px;
+  height:170px;
+
+  right:15%;
+  bottom:25px;
+
+  border:1px solid rgba(221,199,153,.28);
+
+  box-shadow:
+    inset 0 0 0 25px rgba(255,255,255,.015);
+
+}
+
+
+.lifestyle-image{
+
+  background:
+    linear-gradient(
+      135deg,
+      #111,
+      #28241e 45%,
+      #705e43
+    );
+
+}
+
+
+.lifestyle-image:before{
+
+  content:"";
+
+  position:absolute;
+
+  width:230px;
+  height:230px;
+
+  right:-40px;
+  top:-50px;
+
+  border-radius:50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(222,194,132,.18),
+      rgba(222,194,132,0) 70%
+    );
+
+}
+
+
+/* IMAGE TEXT */
+
+.luxury-image-overlay{
+
+  position:absolute;
+
+  inset:0;
+
   background:
     linear-gradient(
       180deg,
-      #b9dfff 0%,
-      #eaf7ff 60%,
-      #f7dca2 100%
+      rgba(0,0,0,.05),
+      rgba(0,0,0,.72)
     );
-  border-bottom:2px solid #111;
-  position:relative;
-  overflow:hidden;
+
 }
 
-.dream-image:before{
-  content:"";
+
+.luxury-card-image-text{
+
+  position:relative;
+
+  z-index:3;
+
+}
+
+
+.luxury-card-image-text span{
+
+  display:block;
+
+  color:#cbb57e;
+
+  font-size:9px;
+
+  letter-spacing:.28em;
+
+  margin-bottom:7px;
+
+}
+
+
+.luxury-card-image-text strong{
+
+  font-family:"Playfair Display",Georgia,serif;
+
+  color:#f3ead7;
+
+  font-size:clamp(30px,5vw,52px);
+
+  font-weight:500;
+
+  letter-spacing:.02em;
+
+}
+
+
+/* COMING SOON */
+
+.coming-soon{
+
   position:absolute;
-  width:170px;
-  height:170px;
-  border-radius:50%;
-  background:#fff4c4;
-  top:-65px;
-  right:-30px;
-  opacity:.85;
+
+  top:20px;
+
+  right:20px;
+
+  z-index:5;
+
+  padding:6px 9px;
+
+  border:1px solid rgba(215,190,133,.4);
+
+  color:#c8b17c;
+
+  font-size:8px;
+
+  letter-spacing:.18em;
+
+  background:rgba(8,8,7,.6);
+
 }
 
-.seoul-skyline{
-  position:relative;
-  z-index:2;
-  font-size:clamp(48px,12vw,92px);
-  font-weight:1000;
-  letter-spacing:-.08em;
-  color:#111;
-  text-shadow:4px 4px 0 rgba(255,255,255,.8);
+
+/* CARD CONTENT */
+
+.luxury-card-content{
+
+  padding:28px;
+
 }
 
-.seoul-symbols{
-  position:relative;
-  z-index:2;
-  font-size:25px;
-  margin-top:4px;
-  letter-spacing:8px;
+
+.luxury-card-eyebrow{
+
+  color:#c8a75a;
+
+  font-size:9px;
+
+  font-weight:700;
+
+  letter-spacing:.22em;
+
+  margin-bottom:10px;
+
 }
 
-.dream-card-content{
-  padding:26px;
-}
 
-.dream-card-eyebrow{
-  font-size:10px;
-  font-weight:900;
-  letter-spacing:.12em;
-  color:#e3262e;
-  margin-bottom:8px;
-}
+.luxury-card-content h2{
 
-.dream-card h2{
-  margin:0 0 12px;
-  font-size:clamp(25px,5vw,40px);
+  font-family:"Playfair Display",Georgia,serif;
+
+  font-weight:500;
+
+  font-size:clamp(27px,4vw,39px);
+
   line-height:1.05;
-  letter-spacing:-.04em;
+
+  letter-spacing:-.02em;
+
+  color:#f2ecdf;
+
+  margin:0 0 13px;
+
 }
 
-.dream-card p{
-  margin:0 0 20px;
-  color:#666;
-  line-height:1.6;
-  font-size:15px;
-}
 
-.dream-tags{
-  display:flex;
-  flex-wrap:wrap;
-  gap:7px;
-  margin-bottom:24px;
-}
+.luxury-card-content p{
 
-.dream-tags span{
-  padding:7px 10px;
-  background:#f3f3f3;
-  border-radius:999px;
-  font-size:12px;
-  font-weight:800;
-}
+  color:#9d988d;
 
-.dream-button{
-  width:100%;
-  border:2px solid #111;
-  border-radius:12px;
-  padding:15px 18px;
-  background:#111;
-  color:#fff;
   font-size:14px;
-  font-weight:900;
-  letter-spacing:.04em;
-  cursor:pointer;
-  transition:transform .15s ease, box-shadow .15s ease;
+
+  line-height:1.7;
+
+  margin:0 0 20px;
+
+  max-width:520px;
+
 }
 
-.dream-button:hover{
-  transform:translateY(-2px);
-  box-shadow:0 5px 0 #e3262e;
-}
 
-.dream-button:active{
-  transform:translateY(1px);
-  box-shadow:none;
-}
+.luxury-card-tags{
 
-.future-dreams{
-  max-width:760px;
-  margin:55px auto 0;
-}
-
-.future-title{
-  margin-bottom:15px;
-  font-size:11px;
-  font-weight:900;
-  letter-spacing:.12em;
-  color:#888;
-}
-
-.future-grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:10px;
-}
-
-.future-card{
-  min-height:95px;
   display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  border:1px solid #ddd;
-  border-radius:14px;
-  background:#fafafa;
-  color:#aaa;
-  font-size:25px;
+
+  flex-wrap:wrap;
+
+  gap:7px;
+
+  margin-bottom:24px;
+
 }
 
-.future-card span{
-  font-size:11px;
+
+.luxury-card-tags span{
+
+  border:1px solid rgba(200,167,90,.2);
+
+  color:#a99c84;
+
+  padding:6px 9px;
+
+  font-size:8px;
+
+  letter-spacing:.13em;
+
+}
+
+
+/* BUTTON */
+
+.luxury-card-button{
+
+  width:100%;
+
+  padding:14px 18px;
+
+  border:1px solid #c8a75a;
+
+  background:#c8a75a;
+
+  color:#111;
+
+  font-size:10px;
+
   font-weight:800;
+
+  letter-spacing:.14em;
+
+  transition:
+    background .2s ease,
+    color .2s ease;
+
 }
 
-@media(max-width:600px){
 
-  .dream-content{
-    width:min(100% - 24px, 900px);
-    padding-top:32px;
+.luxury-card-button span{
+
+  margin-left:10px;
+
+  font-size:15px;
+
+}
+
+
+.luxury-card-button:hover{
+
+  background:#e1c783;
+
+}
+
+
+/* FOOTER */
+
+.luxury-footer-note{
+
+  text-align:center;
+
+  padding-top:65px;
+
+}
+
+
+.luxury-footer-note span{
+
+  color:#8f805f;
+
+  font-size:9px;
+
+  letter-spacing:.35em;
+
+}
+
+
+.luxury-footer-note p{
+
+  color:#6f6a60;
+
+  font-size:12px;
+
+  letter-spacing:.08em;
+
+}
+
+
+/* =========================================================
+   DESTINATION SELECTOR
+   ========================================================= */
+
+.luxury-destination{
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      #3c3529,
+      #11100f 48%,
+      #070707 100%
+    );
+
+}
+
+
+.luxury-back{
+
+  border:0;
+
+  background:transparent;
+
+  color:#b7aa91;
+
+  font-size:10px;
+
+  letter-spacing:.14em;
+
+  cursor:pointer;
+
+}
+
+
+.destination-content{
+
+  width:min(1150px,calc(100% - 36px));
+
+  margin:0 auto;
+
+  padding:72px 0 80px;
+
+  text-align:center;
+
+}
+
+
+.destination-content h1{
+
+  font-family:"Playfair Display",Georgia,serif;
+
+  font-size:clamp(46px,8vw,82px);
+
+  font-weight:500;
+
+  line-height:.95;
+
+  margin:14px 0;
+
+  color:#f5eee1;
+
+}
+
+
+.destination-content > p{
+
+  color:#938d82;
+
+  font-size:15px;
+
+  margin:0 0 50px;
+
+}
+
+
+.destination-grid{
+
+  display:grid;
+
+  grid-template-columns:repeat(2,minmax(0,1fr));
+
+  gap:18px;
+
+}
+
+
+.destination-card{
+
+  min-height:370px;
+
+  position:relative;
+
+  overflow:hidden;
+
+  border:1px solid rgba(200,167,90,.22);
+
+  background:#161514;
+
+  text-align:left;
+
+  display:flex;
+
+  align-items:flex-end;
+
+  cursor:default;
+
+  transition:
+    transform .3s ease,
+    border-color .3s ease;
+
+}
+
+
+.destination-card:hover{
+
+  border-color:rgba(200,167,90,.6);
+
+}
+
+
+.seoul-destination{
+
+  cursor:pointer;
+
+  background:
+    linear-gradient(
+      135deg,
+      #111 5%,
+      #22201c 45%,
+      #79633d 100%
+    );
+
+}
+
+
+.seoul-destination:hover{
+
+  transform:translateY(-4px);
+
+}
+
+
+.new-york-destination{
+
+  background:
+    linear-gradient(
+      135deg,
+      #101315,
+      #24262a 50%,
+      #4b4a43
+    );
+
+}
+
+
+.paris-destination{
+
+  background:
+    linear-gradient(
+      135deg,
+      #181615,
+      #302821 50%,
+      #665345
+    );
+
+}
+
+
+.tokyo-destination{
+
+  background:
+    linear-gradient(
+      135deg,
+      #121212,
+      #27211f 50%,
+      #684f47
+    );
+
+}
+
+
+.london-destination{
+
+  background:
+    linear-gradient(
+      135deg,
+      #111,
+      #252523 50%,
+      #4f514e
+    );
+
+}
+
+
+.dubai-destination{
+
+  background:
+    linear-gradient(
+      135deg,
+      #151311,
+      #332b20 50%,
+      #866e43
+    );
+
+}
+
+
+.destination-overlay{
+
+  position:absolute;
+
+  inset:0;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0,0,0,.05),
+      rgba(0,0,0,.8)
+    );
+
+}
+
+
+.destination-info{
+
+  position:relative;
+
+  z-index:2;
+
+  padding:30px;
+
+  width:100%;
+
+}
+
+
+.destination-info > span{
+
+  display:block;
+
+  color:#c8a75a;
+
+  font-size:9px;
+
+  letter-spacing:.2em;
+
+  margin-bottom:14px;
+
+}
+
+
+.destination-info small{
+
+  display:block;
+
+  color:#a69c8b;
+
+  font-size:8px;
+
+  letter-spacing:.25em;
+
+  margin-bottom:5px;
+
+}
+
+
+.destination-info h2{
+
+  font-family:"Playfair Display",Georgia,serif;
+
+  font-weight:500;
+
+  font-size:clamp(40px,6vw,64px);
+
+  color:#f4ecdc;
+
+  margin:0;
+
+  letter-spacing:.02em;
+
+}
+
+
+.destination-info p{
+
+  color:#a69e90;
+
+  font-size:10px;
+
+  letter-spacing:.15em;
+
+  margin:7px 0 18px;
+
+}
+
+
+.destination-info button{
+
+  border:1px solid #c8a75a;
+
+  background:#c8a75a;
+
+  color:#111;
+
+  padding:10px 14px;
+
+  font-size:9px;
+
+  font-weight:800;
+
+  letter-spacing:.12em;
+
+}
+
+
+/* =========================================================
+   SEOUL PLACEHOLDER
+   ========================================================= */
+
+.luxury-seoul-placeholder{
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      #443a2c,
+      #12110f 45%,
+      #070707
+    );
+
+}
+
+
+.seoul-placeholder-content{
+
+  width:min(950px,calc(100% - 36px));
+
+  margin:0 auto;
+
+  padding:80px 0;
+
+  text-align:center;
+
+}
+
+
+.seoul-placeholder-content h1{
+
+  font-family:"Playfair Display",Georgia,serif;
+
+  font-size:clamp(45px,8vw,82px);
+
+  font-weight:500;
+
+  line-height:.95;
+
+  color:#f4eee1;
+
+  margin:15px 0 20px;
+
+}
+
+
+.seoul-placeholder-content > p{
+
+  color:#9a9388;
+
+  max-width:600px;
+
+  margin:0 auto 50px;
+
+  line-height:1.7;
+
+}
+
+
+.seoul-coming-soon{
+
+  display:grid;
+
+  grid-template-columns:100px 1fr;
+
+  gap:30px;
+
+  text-align:left;
+
+  padding:35px;
+
+  border:1px solid rgba(200,167,90,.35);
+
+  background:#11110f;
+
+}
+
+
+.seoul-coming-number{
+
+  font-family:"Playfair Display",Georgia,serif;
+
+  color:#c8a75a;
+
+  font-size:50px;
+
+}
+
+
+.seoul-coming-soon span{
+
+  color:#c8a75a;
+
+  font-size:9px;
+
+  letter-spacing:.22em;
+
+}
+
+
+.seoul-coming-soon h2{
+
+  font-family:"Playfair Display",Georgia,serif;
+
+  font-weight:500;
+
+  font-size:38px;
+
+  color:#eee7d9;
+
+  margin:8px 0;
+
+}
+
+
+.seoul-coming-soon p{
+
+  color:#898378;
+
+  line-height:1.6;
+
+  margin:0;
+
+}
+
+
+/* MOBILE */
+
+@media(max-width:760px){
+
+  .luxury-topbar{
+
+    padding:17px 15px;
+
   }
 
-  .dream-topbar{
-    padding:14px 12px;
+
+  .luxury-wordmark{
+
+    font-size:21px;
+
   }
 
-  .dream-image{
-    min-height:190px;
+
+  .luxury-content{
+
+    width:calc(100% - 24px);
+
+    padding-top:48px;
+
   }
 
-  .dream-card-content{
-    padding:20px;
+
+  .luxury-content h1{
+
+    font-size:clamp(44px,13vw,65px);
+
   }
 
-  .future-grid{
-    grid-template-columns:repeat(2,1fr);
+
+  .luxury-intro{
+
+    font-size:14px;
+
   }
 
-  .future-card{
-    min-height:85px;
+
+  .fortune-display{
+
+    margin-bottom:42px;
+
+    padding:16px 22px;
+
   }
+
+
+  .luxury-dream-grid{
+
+    grid-template-columns:1fr;
+
+    gap:16px;
+
+  }
+
+
+  .luxury-card-image{
+
+    height:230px;
+
+  }
+
+
+  .luxury-card-content{
+
+    padding:22px;
+
+  }
+
+
+  .destination-content{
+
+    width:calc(100% - 24px);
+
+    padding-top:48px;
+
+  }
+
+
+  .destination-grid{
+
+    grid-template-columns:1fr;
+
+  }
+
+
+  .destination-card{
+
+    min-height:300px;
+
+  }
+
+
+  .destination-info{
+
+    padding:24px;
+
+  }
+
+
+  .seoul-coming-soon{
+
+    grid-template-columns:1fr;
+
+    gap:10px;
+
+    padding:25px;
+
+  }
+
+
+  .seoul-coming-number{
+
+    font-size:35px;
+
+  }
+
+
+  .seoul-coming-soon h2{
+
+    font-size:30px;
+
+  }
+
+}
+
+
+@media(max-width:430px){
+
+  .luxury-topbar{
+
+    padding:15px 12px;
+
+  }
+
+
+  .luxury-wordmark{
+
+    font-size:18px;
+
+  }
+
+
+  .luxury-lang-toggle{
+
+    padding:7px 10px;
+
+    font-size:10px;
+
+  }
+
+
+  .luxury-card-image{
+
+    height:210px;
+
+  }
+
+
+  .luxury-card-image-text strong{
+
+    font-size:34px;
+
+  }
+
+
+  .luxury-card-content h2{
+
+    font-size:28px;
+
+  }
+
+
+  .destination-info h2{
+
+    font-size:48px;
+
+  }
+
 }
