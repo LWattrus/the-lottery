@@ -7,6 +7,7 @@ const state = {
   cart: [],
   drawn: false,
   dream: false,
+  destination: null,
   selected: []
 };
 
@@ -70,17 +71,22 @@ function render(){
     return;
   }
 
-  if(!state.drawn){
-    app.innerHTML = ticketScreen();
+    if(!state.drawn){
+    app.innerHTML=ticketScreen();
     return;
   }
 
   if(!state.dream){
-    app.innerHTML = dreamPickerScreen();
+    app.innerHTML=dreamPickerScreen();
     return;
   }
 
-  app.innerHTML = shopScreen();
+  if(state.destination === "seoul"){
+    app.innerHTML=seoulPlannerScreen();
+    return;
+  }
+
+  app.innerHTML=destinationScreen();
 }
 
 
@@ -90,113 +96,312 @@ function render(){
 
 function dreamPickerScreen(){
   return `
-    <div class="dream-picker">
+    <div class="luxury-dream-picker">
 
-      <div class="dream-topbar">
-        <div class="wordmark">${t("title")}</div>
+      <div class="luxury-topbar">
+        <div class="luxury-wordmark">
+          <span>THE</span>
+          LOTTERY
+        </div>
 
         <button
-          class="lang-toggle"
+          class="luxury-lang-toggle"
           onclick="setLang(state.lang==='en'?'ko':'en')"
         >
-          ${state.lang==='en'?'🇰🇷 한국어':'🇬🇧 English'}
+          ${state.lang==='en'?'한국어':'English'}
         </button>
       </div>
 
-      <main class="dream-content">
+      <main class="luxury-content">
 
-        <div class="eyebrow">
-          DREAM LIFE
+        <div class="luxury-eyebrow">
+          ${state.lang==="ko" ? "당신의 새로운 삶" : "YOUR NEW LIFE"}
         </div>
 
         <h1>
-          ${state.lang==="ko" ? "어떤 꿈을 만들어 볼까요?" : "WHAT'S YOUR DREAM?"}
-        </h1>
-
-        <p class="dream-intro">
           ${
             state.lang==="ko"
-            ? "₩750,000,000의 당첨금으로 원하는 삶을 만들어 보세요."
-            : "You have ₩750,000,000. Now decide how you want to spend it."
+            ? "어떤 꿈을 만들어 볼까요?"
+            : "WHAT'S YOUR DREAM?"
+          }
+        </h1>
+
+        <p class="luxury-intro">
+          ${
+            state.lang==="ko"
+            ? "이제 당신에게는 ₩750,000,000이 있습니다. 어떤 삶을 만들어 볼까요?"
+            : "You have ₩750,000,000. Now imagine the life you've always wanted."
           }
         </p>
 
-        <div class="dream-balance">
+        <div class="fortune-display">
+
           <span>
-            ${state.lang==="ko" ? "사용 가능한 금액" : "YOUR FORTUNE"}
+            ${
+              state.lang==="ko"
+              ? "당신의 가상 재산"
+              : "YOUR FICTIONAL FORTUNE"
+            }
           </span>
 
           <strong>₩750,000,000</strong>
+
         </div>
 
-        <section class="dream-options">
 
-          <article class="dream-card featured">
+        <section class="luxury-dream-grid">
 
-            <div class="dream-image">
-              <div class="seoul-skyline">SEOUL</div>
 
-              <div class="seoul-symbols">
-                🏙️ ✨ 🌃
-              </div>
+          <!-- PERFECT GETAWAY -->
+
+          <article
+            class="luxury-dream-card luxury-featured"
+            onclick="openGetaway()"
+          >
+
+            <div class="luxury-card-number">
+              01
             </div>
 
-            <div class="dream-card-content">
+            <div class="luxury-card-image getaway-image">
 
-              <div class="dream-card-eyebrow">
-                ${state.lang==="ko" ? "FIRST DREAM" : "YOUR FIRST DREAM"}
+              <div class="luxury-image-overlay"></div>
+
+              <div class="luxury-card-image-text">
+                <span>
+                  ${state.lang==="ko" ? "여행" : "TRAVEL"}
+                </span>
+
+                <strong>
+                  THE WORLD
+                </strong>
+              </div>
+
+            </div>
+
+            <div class="luxury-card-content">
+
+              <div class="luxury-card-eyebrow">
+                ${state.lang==="ko" ? "완벽한 휴가" : "YOUR PERFECT GETAWAY"}
               </div>
 
               <h2>
-                🇰🇷 ${
+                ${
                   state.lang==="ko"
-                  ? "서울에서의 완벽한 주말"
-                  : "THE PERFECT WEEKEND IN SEOUL"
+                  ? "세상 어디든 떠나보세요."
+                  : "GO ANYWHERE."
                 }
               </h2>
 
               <p>
                 ${
                   state.lang==="ko"
-                  ? "항공권부터 호텔, 맛있는 음식, 쇼핑과 서울의 명소까지 나만의 완벽한 주말을 만들어 보세요."
-                  : "Flights, luxury hotels, incredible food, shopping and the best of Seoul. Build your perfect weekend."
+                  ? "항공권, 호텔, 다이닝, 쇼핑과 특별한 경험으로 꿈의 여행을 만들어 보세요."
+                  : "Fly somewhere extraordinary. Choose your hotel, dining, experiences and everything in between."
                 }
               </p>
 
-              <div class="dream-tags">
-
-                <span>
-                  ✈️ ${state.lang==="ko" ? "항공권" : "Flights"}
-                </span>
-
-                <span>
-                  🏨 ${state.lang==="ko" ? "호텔" : "Hotels"}
-                </span>
-
-                <span>
-                  🍽️ ${state.lang==="ko" ? "맛집" : "Dining"}
-                </span>
-
-                <span>
-                  🎟️ ${state.lang==="ko" ? "명소" : "Experiences"}
-                </span>
-
-                <span>
-                  🛍️ ${state.lang==="ko" ? "쇼핑" : "Shopping"}
-                </span>
-
+              <div class="luxury-card-tags">
+                <span>FLIGHTS</span>
+                <span>HOTELS</span>
+                <span>DINING</span>
+                <span>EXPERIENCES</span>
               </div>
 
-              <button
-                class="dream-button"
-                onclick="startSeoulDream()"
-              >
+              <button class="luxury-card-button">
                 ${
                   state.lang==="ko"
-                  ? "서울 주말 계획하기 →"
-                  : "PLAN MY SEOUL WEEKEND →"
+                  ? "여행 시작하기"
+                  : "CHOOSE YOUR DESTINATION"
                 }
+                <span>→</span>
               </button>
+
+            </div>
+
+          </article>
+
+
+          <!-- SHOP THE WORLD -->
+
+          <article class="luxury-dream-card">
+
+            <div class="luxury-card-number">
+              02
+            </div>
+
+            <div class="luxury-card-image shopping-image">
+
+              <div class="luxury-image-overlay"></div>
+
+              <div class="luxury-card-image-text">
+                <span>
+                  ${state.lang==="ko" ? "쇼핑" : "SHOPPING"}
+                </span>
+
+                <strong>
+                  THE WORLD
+                </strong>
+              </div>
+
+              <div class="coming-soon">
+                COMING SOON
+              </div>
+
+            </div>
+
+            <div class="luxury-card-content">
+
+              <div class="luxury-card-eyebrow">
+                ${state.lang==="ko" ? "세상의 모든 것" : "SHOP THE WORLD"}
+              </div>
+
+              <h2>
+                ${
+                  state.lang==="ko"
+                  ? "원하는 것은 무엇이든."
+                  : "BUY WHAT YOU WANT."
+                }
+              </h2>
+
+              <p>
+                ${
+                  state.lang==="ko"
+                  ? "패션, 시계, 전자제품, 뷰티와 럭셔리 아이템을 마음껏 담아보세요."
+                  : "Fashion, watches, technology, beauty and the things you've always wanted."
+                }
+              </p>
+
+              <div class="luxury-card-tags">
+                <span>FASHION</span>
+                <span>WATCHES</span>
+                <span>TECH</span>
+                <span>BEAUTY</span>
+              </div>
+
+            </div>
+
+          </article>
+
+
+          <!-- DREAM HOME -->
+
+          <article class="luxury-dream-card">
+
+            <div class="luxury-card-number">
+              03
+            </div>
+
+            <div class="luxury-card-image home-image">
+
+              <div class="luxury-image-overlay"></div>
+
+              <div class="luxury-card-image-text">
+                <span>
+                  ${state.lang==="ko" ? "부동산" : "REAL ESTATE"}
+                </span>
+
+                <strong>
+                  YOUR HOME
+                </strong>
+              </div>
+
+              <div class="coming-soon">
+                COMING SOON
+              </div>
+
+            </div>
+
+            <div class="luxury-card-content">
+
+              <div class="luxury-card-eyebrow">
+                ${state.lang==="ko" ? "꿈의 집" : "BUY YOUR DREAM HOME"}
+              </div>
+
+              <h2>
+                ${
+                  state.lang==="ko"
+                  ? "완벽한 집을 만들어 보세요."
+                  : "CREATE YOUR PERFECT HOME."
+                }
+              </h2>
+
+              <p>
+                ${
+                  state.lang==="ko"
+                  ? "꿈의 집, 인테리어, 가구, 자동차와 라이프스타일까지 상상해 보세요."
+                  : "Find your dream property, furnish it beautifully and build the lifestyle around it."
+                }
+              </p>
+
+              <div class="luxury-card-tags">
+                <span>PROPERTY</span>
+                <span>INTERIORS</span>
+                <span>FURNITURE</span>
+                <span>LIFESTYLE</span>
+              </div>
+
+            </div>
+
+          </article>
+
+
+          <!-- LIVE THE DREAM -->
+
+          <article class="luxury-dream-card">
+
+            <div class="luxury-card-number">
+              04
+            </div>
+
+            <div class="luxury-card-image lifestyle-image">
+
+              <div class="luxury-image-overlay"></div>
+
+              <div class="luxury-card-image-text">
+                <span>
+                  ${state.lang==="ko" ? "라이프스타일" : "LIFESTYLE"}
+                </span>
+
+                <strong>
+                  LIVE MORE
+                </strong>
+              </div>
+
+              <div class="coming-soon">
+                COMING SOON
+              </div>
+
+            </div>
+
+            <div class="luxury-card-content">
+
+              <div class="luxury-card-eyebrow">
+                ${state.lang==="ko" ? "꿈의 라이프스타일" : "LIVE THE DREAM"}
+              </div>
+
+              <h2>
+                ${
+                  state.lang==="ko"
+                  ? "돈으로 시간을 사세요."
+                  : "LIVE UNFORGETTABLY."
+                }
+              </h2>
+
+              <p>
+                ${
+                  state.lang==="ko"
+                  ? "최고의 다이닝, 엔터테인먼트, 자동차와 특별한 경험을 상상해 보세요."
+                  : "Cars, dining, entertainment, adventures and unforgettable experiences."
+                }
+              </p>
+
+              <div class="luxury-card-tags">
+                <span>CARS</span>
+                <span>DINING</span>
+                <span>ENTERTAINMENT</span>
+                <span>EXPERIENCES</span>
+              </div>
 
             </div>
 
@@ -204,67 +409,346 @@ function dreamPickerScreen(){
 
         </section>
 
-        <div class="future-dreams">
 
-          <div class="future-title">
+        <div class="luxury-footer-note">
+
+          <span>THE LOTTERY</span>
+
+          <p>
             ${
               state.lang==="ko"
-              ? "더 많은 꿈이 곧 찾아옵니다"
-              : "MORE DREAMS COMING SOON"
+              ? "당신의 꿈은 여기서 시작됩니다."
+              : "Your fortune. Your imagination. Your life."
             }
+          </p>
+
+        </div>
+
+      </main>
+
+    </div>
+  `;
+}
+
+
+function openGetaway(){
+  state.dream = true;
+  state.destination = null;
+  render();
+}
+
+
+function destinationScreen(){
+
+  return `
+    <div class="luxury-destination">
+
+      <div class="luxury-topbar">
+
+        <button
+          class="luxury-back"
+          onclick="state.dream=false;state.destination=null;render()"
+        >
+          ←
+          ${
+            state.lang==="ko"
+            ? "뒤로"
+            : "BACK"
+          }
+        </button>
+
+        <div class="luxury-wordmark">
+          <span>THE</span>
+          LOTTERY
+        </div>
+
+        <button
+          class="luxury-lang-toggle"
+          onclick="setLang(state.lang==='en'?'ko':'en')"
+        >
+          ${state.lang==='en'?'한국어':'English'}
+        </button>
+
+      </div>
+
+
+      <main class="destination-content">
+
+        <div class="luxury-eyebrow">
+          ${
+            state.lang==="ko"
+            ? "완벽한 휴가"
+            : "YOUR PERFECT GETAWAY"
+          }
+        </div>
+
+        <h1>
+          ${
+            state.lang==="ko"
+            ? "어디로 떠날까요?"
+            : "WHERE WILL YOU GO?"
+          }
+        </h1>
+
+        <p>
+          ${
+            state.lang==="ko"
+            ? "꿈의 여행을 시작할 도시를 선택하세요."
+            : "Choose a destination for your dream escape."
+          }
+        </p>
+
+
+        <div class="destination-grid">
+
+
+          <article
+            class="destination-card seoul-destination"
+            onclick="selectDestination('seoul')"
+          >
+
+            <div class="destination-overlay"></div>
+
+            <div class="destination-info">
+
+              <span>01</span>
+
+              <small>ASIA</small>
+
+              <h2>SEOUL</h2>
+
+              <p>
+                ${
+                  state.lang==="ko"
+                  ? "완벽한 서울 주말"
+                  : "THE PERFECT WEEKEND"
+                }
+              </p>
+
+              <button>
+                ${
+                  state.lang==="ko"
+                  ? "선택하기"
+                  : "EXPLORE SEOUL"
+                }
+                →
+              </button>
+
+            </div>
+
+          </article>
+
+
+          <article class="destination-card new-york-destination">
+
+            <div class="destination-overlay"></div>
+
+            <div class="destination-info">
+
+              <span>02</span>
+
+              <small>NORTH AMERICA</small>
+
+              <h2>NEW YORK</h2>
+
+              <p>COMING SOON</p>
+
+            </div>
+
+          </article>
+
+
+          <article class="destination-card paris-destination">
+
+            <div class="destination-overlay"></div>
+
+            <div class="destination-info">
+
+              <span>03</span>
+
+              <small>EUROPE</small>
+
+              <h2>PARIS</h2>
+
+              <p>COMING SOON</p>
+
+            </div>
+
+          </article>
+
+
+          <article class="destination-card tokyo-destination">
+
+            <div class="destination-overlay"></div>
+
+            <div class="destination-info">
+
+              <span>04</span>
+
+              <small>ASIA</small>
+
+              <h2>TOKYO</h2>
+
+              <p>COMING SOON</p>
+
+            </div>
+
+          </article>
+
+
+          <article class="destination-card london-destination">
+
+            <div class="destination-overlay"></div>
+
+            <div class="destination-info">
+
+              <span>05</span>
+
+              <small>EUROPE</small>
+
+              <h2>LONDON</h2>
+
+              <p>COMING SOON</p>
+
+            </div>
+
+          </article>
+
+
+          <article class="destination-card dubai-destination">
+
+            <div class="destination-overlay"></div>
+
+            <div class="destination-info">
+
+              <span>06</span>
+
+              <small>MIDDLE EAST</small>
+
+              <h2>DUBAI</h2>
+
+              <p>COMING SOON</p>
+
+            </div>
+
+          </article>
+
+        </div>
+
+      </main>
+
+    </div>
+  `;
+}
+
+
+function selectDestination(destination){
+
+  state.destination = destination;
+
+  render();
+
+}
+
+
+function seoulPlannerScreen(){
+
+  return `
+    <div class="luxury-seoul-placeholder">
+
+      <div class="luxury-topbar">
+
+        <button
+          class="luxury-back"
+          onclick="state.destination=null;render()"
+        >
+          ←
+          ${
+            state.lang==="ko"
+            ? "목적지"
+            : "DESTINATIONS"
+          }
+        </button>
+
+        <div class="luxury-wordmark">
+          <span>THE</span>
+          LOTTERY
+        </div>
+
+        <button
+          class="luxury-lang-toggle"
+          onclick="setLang(state.lang==='en'?'ko':'en')"
+        >
+          ${state.lang==='en'?'한국어':'English'}
+        </button>
+
+      </div>
+
+
+      <main class="seoul-placeholder-content">
+
+        <div class="luxury-eyebrow">
+          SEOUL · SOUTH KOREA
+        </div>
+
+        <h1>
+          ${
+            state.lang==="ko"
+            ? "서울에서의 완벽한 주말"
+            : "THE PERFECT WEEKEND IN SEOUL"
+          }
+        </h1>
+
+        <p>
+          ${
+            state.lang==="ko"
+            ? "서울의 항공권, 호텔, 다이닝, 경험과 쇼핑을 선택하세요."
+            : "Your flights, hotel, dining, experiences and shopping. Your Seoul weekend starts here."
+          }
+        </p>
+
+        <div class="seoul-coming-soon">
+
+          <div class="seoul-coming-number">
+            01
           </div>
 
-          <div class="future-grid">
+          <div>
 
-            <div class="future-card">
-              🌍
-              <span>
-                ${state.lang==="ko" ? "꿈의 여행" : "Dream Travel"}
-              </span>
-            </div>
+            <span>
+              ${
+                state.lang==="ko"
+                ? "SEOUL WEEKEND PLANNER"
+                : "SEOUL WEEKEND PLANNER"
+              }
+            </span>
 
-            <div class="future-card">
-              🏠
-              <span>
-                ${state.lang==="ko" ? "꿈의 집" : "Dream Home"}
-              </span>
-            </div>
+            <h2>
+              ${
+                state.lang==="ko"
+                ? "당신의 주말을 디자인합니다."
+                : "DESIGN YOUR WEEKEND."
+              }
+            </h2>
 
-            <div class="future-card">
-              🚗
-              <span>
-                ${state.lang==="ko" ? "꿈의 자동차" : "Dream Car"}
-              </span>
-            </div>
-
-            <div class="future-card">
-              💎
-              <span>
-                ${state.lang==="ko" ? "꿈의 쇼핑" : "Dream Shopping"}
-              </span>
-            </div>
+            <p>
+              ${
+                state.lang==="ko"
+                ? "이곳에 실제 호텔, 레스토랑, 명소, 쇼핑과 교통을 선택하는 플래너가 들어갑니다."
+                : "The full Seoul planner will be built here next."
+              }
+            </p>
 
           </div>
 
         </div>
 
       </main>
+
     </div>
   `;
 }
 
-
-/* =========================================================
-   START SEOUL DREAM
-   ========================================================= */
-
-function startSeoulDream(){
-  alert(
-    state.lang==="ko"
-      ? "서울 주말 플래너가 곧 시작됩니다!"
-      : "The Seoul Weekend Planner is coming next!"
-  );
-}
 
 
 /* =========================================================
