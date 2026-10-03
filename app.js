@@ -8,6 +8,7 @@ const state = {
   drawn: false,
   dream: false,
   destination: null,
+  seoulPlanning: false,
   selected: []
 };
 
@@ -652,104 +653,120 @@ function selectDestination(destination){
 
 
 function seoulPlannerScreen(){
-
   return `
-    <div class="luxury-seoul-placeholder">
+    <section class="seoul-hero">
 
-      <div class="luxury-topbar">
+      <div class="seoul-atmosphere"></div>
 
-        <button
-          class="luxury-back"
-          onclick="state.destination=null;render()"
-        >
-          ←
-          ${
-            state.lang==="ko"
-            ? "목적지"
-            : "DESTINATIONS"
-          }
-        </button>
+      <div class="seoul-hero-content">
 
-        <div class="luxury-wordmark">
-          <span>THE</span>
-          LOTTERY
+        <div class="seoul-kicker">
+          SEOUL · 서울
         </div>
 
-        <button
-          class="luxury-lang-toggle"
-          onclick="setLang(state.lang==='en'?'ko':'en')"
-        >
-          ${state.lang==='en'?'한국어':'English'}
+        <div class="seoul-divider">
+          <span></span>
+          <b>✦</b>
+          <span></span>
+        </div>
+
+        <h1>
+          THE PERFECT<br>
+          WEEKEND
+        </h1>
+
+        <p class="seoul-subtitle">
+          Three days. One extraordinary city.
+        </p>
+
+        <div class="seoul-budget">
+          <span>YOUR DREAM BUDGET</span>
+          <strong>₩${state.balance.toLocaleString()}</strong>
+        </div>
+
+        <button class="seoul-build-button" onclick="startSeoulPlanning()">
+          BUILD MY WEEKEND
+          <span>→</span>
         </button>
 
       </div>
 
+      <div class="seoul-scroll">
+        <span>EXPLORE SEOUL</span>
+        <i></i>
+      </div>
 
-      <main class="seoul-placeholder-content">
+    </section>
 
-        <div class="luxury-eyebrow">
-          SEOUL · SOUTH KOREA
-        </div>
+    <section class="seoul-intro">
 
-        <h1>
-          ${
-            state.lang==="ko"
-            ? "서울에서의 완벽한 주말"
-            : "THE PERFECT WEEKEND IN SEOUL"
-          }
-        </h1>
+      <div class="seoul-intro-label">
+        YOUR SEOUL ESCAPE
+      </div>
 
-        <p>
-          ${
-            state.lang==="ko"
-            ? "서울의 항공권, 호텔, 다이닝, 경험과 쇼핑을 선택하세요."
-            : "Your flights, hotel, dining, experiences and shopping. Your Seoul weekend starts here."
-          }
-        </p>
+      <h2>
+        Imagine the weekend<br>
+        you've always wanted.
+      </h2>
 
-        <div class="seoul-coming-soon">
+      <p>
+        Choose where you stay, where you dine, what you experience
+        and how you spend your dream budget.
+      </p>
 
-          <div class="seoul-coming-number">
-            01
-          </div>
+    </section>
 
-          <div>
+    <section class="seoul-categories">
 
-            <span>
-              ${
-                state.lang==="ko"
-                ? "SEOUL WEEKEND PLANNER"
-                : "SEOUL WEEKEND PLANNER"
-              }
-            </span>
+      <div class="seoul-category">
+        <div class="seoul-category-number">01</div>
+        <h3>STAY</h3>
+        <p>Hotels worthy of the weekend.</p>
+        <button onclick="startSeoulPlanning()">EXPLORE →</button>
+      </div>
 
-            <h2>
-              ${
-                state.lang==="ko"
-                ? "당신의 주말을 디자인합니다."
-                : "DESIGN YOUR WEEKEND."
-              }
-            </h2>
+      <div class="seoul-category">
+        <div class="seoul-category-number">02</div>
+        <h3>DINE</h3>
+        <p>Seoul's finest tables.</p>
+        <button onclick="startSeoulPlanning()">EXPLORE →</button>
+      </div>
 
-            <p>
-              ${
-                state.lang==="ko"
-                ? "이곳에 실제 호텔, 레스토랑, 명소, 쇼핑과 교통을 선택하는 플래너가 들어갑니다."
-                : "The full Seoul planner will be built here next."
-              }
-            </p>
+      <div class="seoul-category">
+        <div class="seoul-category-number">03</div>
+        <h3>EXPERIENCE</h3>
+        <p>Culture, adventure and unforgettable moments.</p>
+        <button onclick="startSeoulPlanning()">EXPLORE →</button>
+      </div>
 
-          </div>
+      <div class="seoul-category">
+        <div class="seoul-category-number">04</div>
+        <h3>SHOP</h3>
+        <p>From Korean designers to global luxury.</p>
+        <button onclick="startSeoulPlanning()">EXPLORE →</button>
+      </div>
 
-        </div>
+      <div class="seoul-category">
+        <div class="seoul-category-number">05</div>
+        <h3>MOVE</h3>
+        <p>Travel Seoul in comfort.</p>
+        <button onclick="startSeoulPlanning()">EXPLORE →</button>
+      </div>
 
-      </main>
+    </section>
 
-    </div>
+    <section class="seoul-footer-line">
+      <span></span>
+      <p>SEOUL · 서울</p>
+      <span></span>
+    </section>
   `;
 }
 
-
+function startSeoulPlanning(){
+  state.seoulPlanning = true;
+  render();
+}
 
 /* =========================================================
    LANGUAGE SCREEN
