@@ -6,6 +6,7 @@ const state = {
   search: "",
   cart: [],
   drawn: false,
+  dream: false,
   selected: []
 };
 
@@ -57,10 +58,174 @@ function setLang(lang){
 
 function render(){
   const app=document.getElementById("app");
-  if(!state.lang){ app.innerHTML=languageScreen(); return; }
-  if(!state.agreed){ app.innerHTML=warningScreen(); return; }
-  if(!state.drawn){ app.innerHTML=ticketScreen(); return; }
+
+  if(!state.lang){
+    app.innerHTML=languageScreen();
+    return;
+  }
+
+  if(!state.agreed){
+    app.innerHTML=warningScreen();
+    return;
+  }
+
+  if(!state.drawn){
+    app.innerHTML=ticketScreen();
+    return;
+  }
+
+  if(!state.dream){
+    app.innerHTML=dreamPickerScreen();
+    return;
+  }
+
   app.innerHTML=shopScreen();
+}
+
+function dreamPickerScreen(){
+  return `
+    <div class="dream-picker">
+
+      <div class="dream-topbar">
+        <div class="wordmark">${t("title")}</div>
+
+        <button
+          class="lang-toggle"
+          onclick="setLang(state.lang==='en'?'ko':'en')"
+        >
+          ${state.lang==='en'?'🇰🇷 한국어':'🇬🇧 English'}
+        </button>
+      </div>
+
+      <main class="dream-content">
+
+        <div class="eyebrow">
+          DREAM LIFE
+        </div>
+
+        <h1>
+          ${state.lang==="ko" ? "어떤 꿈을 만들어 볼까요?" : "WHAT'S YOUR DREAM?"}
+        </h1>
+
+        <p class="dream-intro">
+          ${
+            state.lang==="ko"
+            ? "₩750,000,000의 당첨금으로 원하는 삶을 만들어 보세요."
+            : "You have ₩750,000,000. Now decide how you want to spend it."
+          }
+        </p>
+
+        <div class="dream-balance">
+          <span>
+            ${state.lang==="ko" ? "사용 가능한 금액" : "YOUR FORTUNE"}
+          </span>
+
+          <strong>₩750,000,000</strong>
+        </div>
+
+        <section class="dream-options">
+
+          <article class="dream-card featured">
+
+            <div class="dream-image">
+              <div class="seoul-skyline">SEOUL</div>
+              <div class="seoul-symbols">
+                🏙️ ✨ 🌃
+              </div>
+            </div>
+
+            <div class="dream-card-content">
+
+              <div class="dream-card-eyebrow">
+                ${state.lang==="ko" ? "FIRST DREAM" : "YOUR FIRST DREAM"}
+              </div>
+
+              <h2>
+                🇰🇷 ${state.lang==="ko"
+                  ? "서울에서의 완벽한 주말"
+                  : "THE PERFECT WEEKEND IN SEOUL"}
+              </h2>
+
+              <p>
+                ${
+                  state.lang==="ko"
+                  ? "항공권부터 호텔, 맛있는 음식, 쇼핑과 서울의 명소까지 나만의 완벽한 주말을 만들어 보세요."
+                  : "Flights, luxury hotels, incredible food, shopping and the best of Seoul. Build your perfect weekend."
+                }
+              </p>
+
+              <div class="dream-tags">
+                <span>✈️ ${state.lang==="ko" ? "항공권" : "Flights"}</span>
+                <span>🏨 ${state.lang==="ko" ? "호텔" : "Hotels"}</span>
+                <span>🍽️ ${state.lang==="ko" ? "맛집" : "Dining"}</span>
+                <span>🎟️ ${state.lang==="ko" ? "명소" : "Experiences"}</span>
+                <span>🛍️ ${state.lang==="ko" ? "쇼핑" : "Shopping"}</span>
+              </div>
+
+              <button
+                class="dream-button"
+                onclick="startSeoulDream()"
+              >
+                ${
+                  state.lang==="ko"
+                  ? "서울 주말 계획하기 →"
+                  : "PLAN MY SEOUL WEEKEND →"
+                }
+              </button>
+
+            </div>
+
+          </article>
+
+        </section>
+
+        <div class="future-dreams">
+
+          <div class="future-title">
+            ${
+              state.lang==="ko"
+              ? "더 많은 꿈이 곧 찾아옵니다"
+              : "MORE DREAMS COMING SOON"
+            }
+          </div>
+
+          <div class="future-grid">
+
+            <div class="future-card">
+              🌍
+              <span>${state.lang==="ko" ? "꿈의 여행" : "Dream Travel"}</span>
+            </div>
+
+            <div class="future-card">
+              🏠
+              <span>${state.lang==="ko" ? "꿈의 집" : "Dream Home"}</span>
+            </div>
+
+            <div class="future-card">
+              🚗
+              <span>${state.lang==="ko" ? "꿈의 자동차" : "Dream Car"}</span>
+            </div>
+
+            <div class="future-card">
+              💎
+              <span>${state.lang==="ko" ? "꿈의 쇼핑" : "Dream Shopping"}</span>
+            </div>
+
+          </div>
+
+        </div>
+
+      </main>
+    </div>
+  `;
+}
+
+function startSeoulDream(){
+  alert(
+    state.lang==="ko"
+      ? "서울 주말 플래너가 곧 시작됩니다!"
+      : "The Seoul Weekend Planner is coming next!"
+  );
 }
 
 function languageScreen(){
