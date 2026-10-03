@@ -28,6 +28,7 @@ const T = {
     close:"CLOSE", search:"Search products...", items:"items", reset:"START OVER",
     chooseSix:"Choose 6 numbers to continue.", lotteryReady:"YOUR NUMBERS"
   },
+
   ko: {
     title:"THE LOTTERY", subtitle:"당첨금을 받고, 내가 원하는 삶을 만들어 보세요.",
     warningTitle:"게임을 시작하기 전에", warning1:"이 사이트는 가상 시뮬레이션입니다. 돈, 당첨금, 구매 및 배송은 실제가 아닙니다.",
@@ -51,36 +52,41 @@ const money = n => "₩" + Math.round(n).toLocaleString("ko-KR");
 const t = k => T[state.lang || "en"][k] || k;
 
 function setLang(lang){
-  state.lang=lang;
-  localStorage.setItem("dreamLang",lang);
+  state.lang = lang;
+  localStorage.setItem("dreamLang", lang);
   render();
 }
 
 function render(){
-  const app=document.getElementById("app");
+  const app = document.getElementById("app");
 
   if(!state.lang){
-    app.innerHTML=languageScreen();
+    app.innerHTML = languageScreen();
     return;
   }
 
   if(!state.agreed){
-    app.innerHTML=warningScreen();
+    app.innerHTML = warningScreen();
     return;
   }
 
   if(!state.drawn){
-    app.innerHTML=ticketScreen();
+    app.innerHTML = ticketScreen();
     return;
   }
 
   if(!state.dream){
-    app.innerHTML=dreamPickerScreen();
+    app.innerHTML = dreamPickerScreen();
     return;
   }
 
-  app.innerHTML=shopScreen();
+  app.innerHTML = shopScreen();
 }
+
+
+/* =========================================================
+   DREAM PICKER
+   ========================================================= */
 
 function dreamPickerScreen(){
   return `
@@ -129,6 +135,7 @@ function dreamPickerScreen(){
 
             <div class="dream-image">
               <div class="seoul-skyline">SEOUL</div>
+
               <div class="seoul-symbols">
                 🏙️ ✨ 🌃
               </div>
@@ -141,9 +148,11 @@ function dreamPickerScreen(){
               </div>
 
               <h2>
-                🇰🇷 ${state.lang==="ko"
+                🇰🇷 ${
+                  state.lang==="ko"
                   ? "서울에서의 완벽한 주말"
-                  : "THE PERFECT WEEKEND IN SEOUL"}
+                  : "THE PERFECT WEEKEND IN SEOUL"
+                }
               </h2>
 
               <p>
@@ -155,11 +164,27 @@ function dreamPickerScreen(){
               </p>
 
               <div class="dream-tags">
-                <span>✈️ ${state.lang==="ko" ? "항공권" : "Flights"}</span>
-                <span>🏨 ${state.lang==="ko" ? "호텔" : "Hotels"}</span>
-                <span>🍽️ ${state.lang==="ko" ? "맛집" : "Dining"}</span>
-                <span>🎟️ ${state.lang==="ko" ? "명소" : "Experiences"}</span>
-                <span>🛍️ ${state.lang==="ko" ? "쇼핑" : "Shopping"}</span>
+
+                <span>
+                  ✈️ ${state.lang==="ko" ? "항공권" : "Flights"}
+                </span>
+
+                <span>
+                  🏨 ${state.lang==="ko" ? "호텔" : "Hotels"}
+                </span>
+
+                <span>
+                  🍽️ ${state.lang==="ko" ? "맛집" : "Dining"}
+                </span>
+
+                <span>
+                  🎟️ ${state.lang==="ko" ? "명소" : "Experiences"}
+                </span>
+
+                <span>
+                  🛍️ ${state.lang==="ko" ? "쇼핑" : "Shopping"}
+                </span>
+
               </div>
 
               <button
@@ -193,22 +218,30 @@ function dreamPickerScreen(){
 
             <div class="future-card">
               🌍
-              <span>${state.lang==="ko" ? "꿈의 여행" : "Dream Travel"}</span>
+              <span>
+                ${state.lang==="ko" ? "꿈의 여행" : "Dream Travel"}
+              </span>
             </div>
 
             <div class="future-card">
               🏠
-              <span>${state.lang==="ko" ? "꿈의 집" : "Dream Home"}</span>
+              <span>
+                ${state.lang==="ko" ? "꿈의 집" : "Dream Home"}
+              </span>
             </div>
 
             <div class="future-card">
               🚗
-              <span>${state.lang==="ko" ? "꿈의 자동차" : "Dream Car"}</span>
+              <span>
+                ${state.lang==="ko" ? "꿈의 자동차" : "Dream Car"}
+              </span>
             </div>
 
             <div class="future-card">
               💎
-              <span>${state.lang==="ko" ? "꿈의 쇼핑" : "Dream Shopping"}</span>
+              <span>
+                ${state.lang==="ko" ? "꿈의 쇼핑" : "Dream Shopping"}
+              </span>
             </div>
 
           </div>
@@ -220,6 +253,11 @@ function dreamPickerScreen(){
   `;
 }
 
+
+/* =========================================================
+   START SEOUL DREAM
+   ========================================================= */
+
 function startSeoulDream(){
   alert(
     state.lang==="ko"
@@ -228,87 +266,311 @@ function startSeoulDream(){
   );
 }
 
+
+/* =========================================================
+   LANGUAGE SCREEN
+   ========================================================= */
+
 function languageScreen(){
-  return `<div class="screen language-screen center"><div class="lang-card">
-    <div class="eyebrow">DREAM LIFE</div><div class="logo">THE<br>LOTTERY</div>
-    <p class="subtitle">Choose your language / 언어를 선택하세요</p>
-    <div class="lang-buttons">
-      <button onclick="setLang('en')">🇬🇧 English</button>
-      <button onclick="setLang('ko')">🇰🇷 한국어</button>
+  return `
+    <div class="screen language-screen center">
+      <div class="lang-card">
+
+        <div class="eyebrow">
+          DREAM LIFE
+        </div>
+
+        <div class="logo">
+          THE<br>LOTTERY
+        </div>
+
+        <p class="subtitle">
+          Choose your language / 언어를 선택하세요
+        </p>
+
+        <div class="lang-buttons">
+
+          <button onclick="setLang('en')">
+            🇬🇧 English
+          </button>
+
+          <button onclick="setLang('ko')">
+            🇰🇷 한국어
+          </button>
+
+        </div>
+
+      </div>
     </div>
-  </div></div>`;
+  `;
 }
+
+
+/* =========================================================
+   WARNING SCREEN
+   ========================================================= */
 
 function warningScreen(){
-  return `<div class="screen language-screen center"><div class="lang-card">
-    <div class="eyebrow">THE LOTTERY</div>
-    <h2>${t("warningTitle")}</h2>
-    <div class="warning"><ul>
-      <li>${t("warning1")}</li><li>${t("warning2")}</li><li>${t("warning3")}</li>
-    </ul><div class="warning-actions">
-      <button class="primary" onclick="state.agreed=true;render()">${t("agree")}</button>
-      <button class="secondary" onclick="state.lang=null;localStorage.removeItem('dreamLang');render()">${t("back")}</button>
-    </div></div>
-  </div></div>`;
+  return `
+    <div class="screen language-screen center">
+
+      <div class="lang-card">
+
+        <div class="eyebrow">
+          THE LOTTERY
+        </div>
+
+        <h2>
+          ${t("warningTitle")}
+        </h2>
+
+        <div class="warning">
+
+          <ul>
+            <li>${t("warning1")}</li>
+            <li>${t("warning2")}</li>
+            <li>${t("warning3")}</li>
+          </ul>
+
+          <div class="warning-actions">
+
+            <button
+              class="primary"
+              onclick="state.agreed=true;render()"
+            >
+              ${t("agree")}
+            </button>
+
+            <button
+              class="secondary"
+              onclick="state.lang=null;localStorage.removeItem('dreamLang');render()"
+            >
+              ${t("back")}
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  `;
 }
 
-const ballColor = n => n <= 10 ? "yellow" : n <= 20 ? "blue" : n <= 30 ? "red" : n <= 40 ? "gray" : "green";
+
+/* =========================================================
+   LOTTERY
+   ========================================================= */
+
+const ballColor = n =>
+  n <= 10 ? "yellow" :
+  n <= 20 ? "blue" :
+  n <= 30 ? "red" :
+  n <= 40 ? "gray" :
+  "green";
+
 
 function lottoMark(n, extra=""){
-  return `<button class="lotto-mark ${extra}" onclick="toggleNumber(${n})" aria-label="Number ${n}" aria-pressed="${extra.includes("selected") ? "true" : "false"}"><span>${n}</span></button>`;
+  return `
+    <button
+      class="lotto-mark ${extra}"
+      onclick="toggleNumber(${n})"
+      aria-label="Number ${n}"
+      aria-pressed="${extra.includes("selected") ? "true" : "false"}"
+    >
+      <span>${n}</span>
+    </button>
+  `;
 }
+
 
 function ticketScreen(){
+
   const selected = state.selected;
-  return `<div class="hero"><div class="topbar"><div class="wordmark">${t("title")}</div><button class="lang-toggle" onclick="setLang(state.lang==='en'?'ko':'en')">${state.lang==='en'?'🇰🇷 한국어':'🇬🇧 English'}</button></div>
-    <div class="hero-main"><div class="ticket-wrap">
-      <div class="eyebrow">DREAM LIFE</div>
-      <h1>${t("ticket")}</h1>
-      <div class="ticket korean-ticket">
-        <div class="ticket-brand"><span>동행복권</span><strong>Lotto <b>6/45</b></strong></div>
-        <div class="ticket-price">₩1,000 <span>GAME</span></div>
-        <p class="ticket-instruction">${t("pick")}</p>
-        <div class="selected-label">${t("lotteryReady")}: <strong>${selected.length}/6</strong></div>
-        <div class="selected-balls selected-marks">
-          ${selected.map(n=>lottoMark(n,"selected chosen")).join("") || `<span class="empty-selection">${state.lang==='ko'?'번호를 선택하세요':'Choose your numbers'}</span>`}
+
+  return `
+    <div class="hero">
+
+      <div class="topbar">
+
+        <div class="wordmark">
+          ${t("title")}
         </div>
-        <div class="number-grid lotto-grid">
-          ${Array.from({length:45},(_,i)=>i+1).map(n=>lottoMark(n, selected.includes(n) ? "selected" : "")).join("")}
-        </div>
-        <div class="ticket-bottom"><span>● ${state.lang==='ko'?'수동 선택':'MANUAL'}</span><span>${selected.length}/6</span></div>
-        <div class="draw-area" id="drawArea"></div>
-        <button class="draw-button" id="drawBtn" onclick="drawLottery()" ${selected.length!==6?"disabled":""}>${t("draw")}</button>
-        ${selected.length!==6 ? `<div class="choose-note">${t("chooseSix")}</div>` : ""}
+
+        <button
+          class="lang-toggle"
+          onclick="setLang(state.lang==='en'?'ko':'en')"
+        >
+          ${state.lang==='en'?'🇰🇷 한국어':'🇬🇧 English'}
+        </button>
+
       </div>
-    </div></div></div>`;
+
+      <div class="hero-main">
+
+        <div class="ticket-wrap">
+
+          <div class="eyebrow">
+            DREAM LIFE
+          </div>
+
+          <h1>
+            ${t("ticket")}
+          </h1>
+
+          <div class="ticket korean-ticket">
+
+            <div class="ticket-brand">
+              <span>동행복권</span>
+              <strong>
+                Lotto <b>6/45</b>
+              </strong>
+            </div>
+
+            <div class="ticket-price">
+              ₩1,000 <span>GAME</span>
+            </div>
+
+            <p class="ticket-instruction">
+              ${t("pick")}
+            </p>
+
+            <div class="selected-label">
+              ${t("lotteryReady")}:
+              <strong>${selected.length}/6</strong>
+            </div>
+
+            <div class="selected-balls selected-marks">
+
+              ${
+                selected.map(n =>
+                  lottoMark(n,"selected chosen")
+                ).join("")
+                ||
+                `<span class="empty-selection">
+                  ${
+                    state.lang==='ko'
+                    ? '번호를 선택하세요'
+                    : 'Choose your numbers'
+                  }
+                </span>`
+              }
+
+            </div>
+
+            <div class="number-grid lotto-grid">
+
+              ${
+                Array.from(
+                  {length:45},
+                  (_,i)=>i+1
+                )
+                .map(n =>
+                  lottoMark(
+                    n,
+                    selected.includes(n)
+                    ? "selected"
+                    : ""
+                  )
+                )
+                .join("")
+              }
+
+            </div>
+
+            <div class="ticket-bottom">
+
+              <span>
+                ● ${state.lang==='ko'?'수동 선택':'MANUAL'}
+              </span>
+
+              <span>
+                ${selected.length}/6
+              </span>
+
+            </div>
+
+            <div
+              class="draw-area"
+              id="drawArea"
+            ></div>
+
+            <button
+              class="draw-button"
+              id="drawBtn"
+              onclick="drawLottery()"
+              ${selected.length!==6 ? "disabled" : ""}
+            >
+              ${t("draw")}
+            </button>
+
+            ${
+              selected.length!==6
+              ? `<div class="choose-note">${t("chooseSix")}</div>`
+              : ""
+            }
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  `;
 }
 
+
 function toggleNumber(n){
+
   if(state.selected.includes(n)){
-    state.selected=state.selected.filter(x=>x!==n);
-  } else if(state.selected.length<6){
-    state.selected=[...state.selected,n].sort((a,b)=>a-b);
+
+    state.selected =
+      state.selected.filter(x => x !== n);
+
+  } else if(state.selected.length < 6){
+
+    state.selected =
+      [...state.selected,n].sort((a,b)=>a-b);
+
   }
+
   render();
 }
 
+
+/* =========================================================
+   LOTTERY DRAW ANIMATION
+   ========================================================= */
+
 function drawLottery(){
-  if(state.selected.length!==6)return;
 
-  const btn=document.getElementById("drawBtn");
-  const area=document.getElementById("drawArea");
+  if(state.selected.length !== 6){
+    return;
+  }
 
-  if(!btn || !area)return;
+  const btn = document.getElementById("drawBtn");
+  const area = document.getElementById("drawArea");
 
-  btn.disabled=true;
-  btn.style.display="none";
+  if(!btn || !area){
+    return;
+  }
 
-  /* Add the draw animation styling */
+  btn.disabled = true;
+  btn.style.display = "none";
+
+
+  /* Add draw animation CSS once */
+
   if(!document.getElementById("lottery-draw-animation-style")){
-    const style=document.createElement("style");
-    style.id="lottery-draw-animation-style";
 
-    style.textContent=`
+    const style = document.createElement("style");
+
+    style.id = "lottery-draw-animation-style";
+
+    style.textContent = `
+
       .lottery-draw-stage{
         margin:24px auto 10px;
         padding:22px 12px 18px;
@@ -400,17 +662,13 @@ function drawLottery(){
         display:flex;
         align-items:center;
         justify-content:center;
-
         font-size:18px;
         font-weight:900;
         color:#111;
-
         border:3px solid rgba(0,0,0,.35);
-
         box-shadow:
           0 5px 0 rgba(0,0,0,.18),
           inset 3px 3px 8px rgba(255,255,255,.75);
-
         animation:
           lotteryBallIn .7s cubic-bezier(.2,.9,.25,1.3) both;
       }
@@ -453,6 +711,7 @@ function drawLottery(){
       }
 
       @keyframes lotteryBallIn{
+
         0%{
           opacity:0;
           transform:
@@ -483,9 +742,11 @@ function drawLottery(){
             scale(1)
             rotate(0);
         }
+
       }
 
       @keyframes lotteryBallPulse{
+
         0%{
           transform:scale(1);
         }
@@ -497,6 +758,7 @@ function drawLottery(){
         100%{
           transform:scale(1);
         }
+
       }
 
       @media(max-width:480px){
@@ -520,6 +782,7 @@ function drawLottery(){
           min-width:45px;
           font-size:16px;
         }
+
       }
 
       @media(prefers-reduced-motion:reduce){
@@ -529,52 +792,72 @@ function drawLottery(){
           opacity:1;
           transform:none;
         }
+
       }
+
     `;
 
     document.head.appendChild(style);
   }
 
-  /* Create the lottery machine and empty ball area */
-  area.innerHTML=`
+
+  /* Draw screen */
+
+  area.innerHTML = `
+
     <div class="lottery-draw-stage">
 
       <div class="lottery-draw-title">
-        ${state.lang==="ko" ? "나의 번호를 추첨하고 있습니다..." : "YOUR NUMBERS ARE BEING DRAWN..."}
+        ${
+          state.lang==="ko"
+          ? "나의 번호를 추첨하고 있습니다..."
+          : "YOUR NUMBERS ARE BEING DRAWN..."
+        }
       </div>
 
       <div class="lottery-machine">
+
         <div class="machine-window"></div>
+
       </div>
 
-      <div class="draw-ball-row" id="drawBallRow"></div>
+      <div
+        class="draw-ball-row"
+        id="drawBallRow"
+      ></div>
 
-      <div class="draw-status" id="drawStatus">
+      <div
+        class="draw-status"
+        id="drawStatus"
+      >
         1 / 6
       </div>
 
     </div>
+
   `;
 
-  const row=document.getElementById("drawBallRow");
-  const status=document.getElementById("drawStatus");
 
-  /*
-    Draw the six numbers one at a time.
-    900ms between balls gives the animation enough time
-    for each number to feel like a real draw.
-  */
+  const row =
+    document.getElementById("drawBallRow");
+
+  const status =
+    document.getElementById("drawStatus");
+
+
+  /* Draw the six selected numbers */
 
   state.selected.forEach((n,i)=>{
 
     setTimeout(()=>{
 
-      const ball=document.createElement("div");
+      const ball =
+        document.createElement("div");
 
-      ball.className=
+      ball.className =
         `draw-ball-animated ${ballColor(n)} latest`;
 
-      ball.textContent=n;
+      ball.textContent = n;
 
       ball.setAttribute(
         "aria-label",
@@ -584,108 +867,554 @@ function drawLottery(){
       row.appendChild(ball);
 
       if(status){
-        status.textContent=`${i+1} / 6`;
+        status.textContent =
+          `${i+1} / 6`;
       }
-
-      /*
-        Remove the "latest" class after the entrance
-        animation so the ball settles into place.
-      */
 
       setTimeout(()=>{
         ball.classList.remove("latest");
       },1200);
 
-    },i*900);
+    }, i * 900);
 
   });
 
-  /*
-    Wait until all six balls have appeared before
-    showing the winning screen.
-  */
+
+  /* Show winning screen after all balls */
 
   setTimeout(
     showWin,
-    state.selected.length*900 + 1300
+    state.selected.length * 900 + 1300
   );
 }
 
+
+/* =========================================================
+   WIN SCREEN
+   ========================================================= */
+
 function showWin(){
-  const el=document.createElement("div");
-  el.className="win";
-  el.innerHTML=`<div class="win-card"><div class="eyebrow">${t("congrats")}</div><h1>${t("won")}</h1><div class="win-amount" id="winAmount">₩0</div><div class="bank-count">${t("remaining")}: <strong>₩750,000,000</strong></div><button class="primary" onclick="state.drawn=true;state.dream=true;render()">${t("continue")}</button></div>`;
+
+  const el =
+    document.createElement("div");
+
+  el.className = "win";
+
+
+  /*
+    IMPORTANT:
+    The win overlay is attached directly to the body.
+    Therefore the button must remove the overlay before
+    rendering the Dream Picker.
+  */
+
+  el.innerHTML = `
+
+    <div class="win-card">
+
+      <div class="eyebrow">
+        ${t("congrats")}
+      </div>
+
+      <h1>
+        ${t("won")}
+      </h1>
+
+      <div
+        class="win-amount"
+        id="winAmount"
+      >
+        ₩0
+      </div>
+
+      <div class="bank-count">
+        ${t("remaining")}:
+        <strong>
+          ₩750,000,000
+        </strong>
+      </div>
+
+      <button
+        class="primary"
+        onclick="
+          this.closest('.win').remove();
+          state.drawn=true;
+          state.dream=false;
+          render();
+        "
+      >
+        ${t("continue")}
+      </button>
+
+    </div>
+
+  `;
+
   document.body.appendChild(el);
 
-  let start=0,target=750000000,dur=2200,startTime=null;
 
-  const tick=ts=>{
-    if(!startTime)startTime=ts;
+  /* Count the money up */
 
-    const p=Math.min((ts-startTime)/dur,1);
-    const eased=1-Math.pow(1-p,3);
-    const amount=start+(target-start)*eased;
+  let start = 0;
+  const target = 750000000;
+  const dur = 2200;
+  let startTime = null;
 
-    const amountEl=document.getElementById("winAmount");
 
-    if(amountEl)amountEl.textContent=money(amount);
+  const tick = ts => {
 
-    if(p<1)requestAnimationFrame(tick);
+    if(!startTime){
+      startTime = ts;
+    }
+
+    const p =
+      Math.min(
+        (ts-startTime)/dur,
+        1
+      );
+
+    const eased =
+      1-Math.pow(1-p,3);
+
+    const amount =
+      start +
+      (target-start)*eased;
+
+    const amountEl =
+      document.getElementById("winAmount");
+
+    if(amountEl){
+      amountEl.textContent =
+        money(amount);
+    }
+
+    if(p < 1){
+      requestAnimationFrame(tick);
+    }
+
   };
+
 
   requestAnimationFrame(tick);
 }
-const labels={all:"all",beauty:"beauty",electronics:"electronics",fashion:"fashion",lifestyle:"lifestyle",hotels:"hotels",dining:"dining"};
+
+
+/* =========================================================
+   SHOP
+   ========================================================= */
+
+const labels = {
+  all:"all",
+  beauty:"beauty",
+  electronics:"electronics",
+  fashion:"fashion",
+  lifestyle:"lifestyle",
+  hotels:"hotels",
+  dining:"dining"
+};
+
 
 function filtered(){
-  const q=state.search.toLowerCase();
-  return PRODUCTS.filter(p=>(state.category==="all"||p.cat===state.category) && (!q || `${p.brand} ${p.name} ${p.ko}`.toLowerCase().includes(q)));
+
+  const q =
+    state.search.toLowerCase();
+
+  return PRODUCTS.filter(p =>
+
+    (state.category==="all" ||
+     p.cat===state.category)
+
+    &&
+
+    (
+      !q ||
+      `${p.brand} ${p.name} ${p.ko}`
+      .toLowerCase()
+      .includes(q)
+    )
+
+  );
 }
+
 
 function productCard(p){
-  const initials=p.brand.split(/\s+/).map(x=>x[0]).slice(0,2).join("").toUpperCase();
-  return `<article class="product"><div class="product-art"><div class="product-cat">${t(p.cat)}</div><span>${initials}</span></div><div class="product-info"><div class="brand">${p.brand}</div><div class="product-name">${p.name}</div><div class="product-ko">${p.ko}</div><div class="price">${money(p.price)}</div><button class="add" onclick="addToCart('${p.id}')">${t("add")}</button></div></article>`;
+
+  const initials =
+    p.brand
+      .split(/\s+/)
+      .map(x=>x[0])
+      .slice(0,2)
+      .join("")
+      .toUpperCase();
+
+  return `
+
+    <article class="product">
+
+      <div class="product-art">
+
+        <div class="product-cat">
+          ${t(p.cat)}
+        </div>
+
+        <span>
+          ${initials}
+        </span>
+
+      </div>
+
+      <div class="product-info">
+
+        <div class="brand">
+          ${p.brand}
+        </div>
+
+        <div class="product-name">
+          ${p.name}
+        </div>
+
+        <div class="product-ko">
+          ${p.ko}
+        </div>
+
+        <div class="price">
+          ${money(p.price)}
+        </div>
+
+        <button
+          class="add"
+          onclick="addToCart('${p.id}')"
+        >
+          ${t("add")}
+        </button>
+
+      </div>
+
+    </article>
+
+  `;
 }
+
 
 function shopScreen(){
-  const list=filtered();
-  return `<div class="shop"><div class="shopbar"><div class="shopnav"><div class="wordmark">${t("title")}</div><input class="search" placeholder="${t("search")}" value="${state.search.replaceAll('"','&quot;')}" oninput="state.search=this.value;render()"><div class="balance">${money(state.balance)}</div></div>
-  <div class="categories">${Object.keys(labels).map(c=>`<button class="cat ${state.category===c?'active':''}" onclick="state.category='${c}';render()">${t(c)}</button>`).join("")}</div></div>
-  <div class="shop-heading"><div><div class="eyebrow">60 REAL-WORLD PICKS</div><h1>${t("shopTitle")}</h1><p>${t("shopSub")}</p></div><button class="lang-toggle" onclick="setLang(state.lang==='en'?'ko':'en')">${state.lang==='en'?'🇰🇷 한국어':'🇬🇧 English'}</button></div>
-  ${list.length ? `<div class="grid">${list.map(productCard).join("")}</div>` : `<div class="empty-shop">${t("empty")}</div>`}
-  ${cartDrawer()}</div>`;
+
+  const list = filtered();
+
+  return `
+
+    <div class="shop">
+
+      <div class="shopbar">
+
+        <div class="shopnav">
+
+          <div class="wordmark">
+            ${t("title")}
+          </div>
+
+          <input
+            class="search"
+            placeholder="${t("search")}"
+            value="${state.search.replaceAll('"','&quot;')}"
+            oninput="state.search=this.value;render()"
+          >
+
+          <div class="balance">
+            ${money(state.balance)}
+          </div>
+
+        </div>
+
+        <div class="categories">
+
+          ${
+            Object.keys(labels)
+              .map(c => `
+
+                <button
+                  class="cat ${state.category===c?'active':''}"
+                  onclick="state.category='${c}';render()"
+                >
+                  ${t(c)}
+                </button>
+
+              `)
+              .join("")
+          }
+
+        </div>
+
+      </div>
+
+
+      <div class="shop-heading">
+
+        <div>
+
+          <div class="eyebrow">
+            60 REAL-WORLD PICKS
+          </div>
+
+          <h1>
+            ${t("shopTitle")}
+          </h1>
+
+          <p>
+            ${t("shopSub")}
+          </p>
+
+        </div>
+
+        <button
+          class="lang-toggle"
+          onclick="setLang(state.lang==='en'?'ko':'en')"
+        >
+          ${state.lang==='en'?'🇰🇷 한국어':'🇬🇧 English'}
+        </button>
+
+      </div>
+
+
+      ${
+        list.length
+        ?
+        `<div class="grid">
+          ${list.map(productCard).join("")}
+        </div>`
+        :
+        `<div class="empty-shop">
+          ${t("empty")}
+        </div>`
+      }
+
+
+      ${cartDrawer()}
+
+    </div>
+
+  `;
 }
+
+
+/* =========================================================
+   CART
+   ========================================================= */
 
 function addToCart(id){
-  const p=PRODUCTS.find(x=>x.id===id);
-  if(!p)return;
-  if(p.price>state.balance){
-    alert(state.lang==='ko'?"잔액이 부족합니다.":"You don't have enough fictional money.");
+
+  const p =
+    PRODUCTS.find(x=>x.id===id);
+
+  if(!p){
     return;
   }
+
+  if(p.price > state.balance){
+
+    alert(
+      state.lang==='ko'
+      ? "잔액이 부족합니다."
+      : "You don't have enough fictional money."
+    );
+
+    return;
+  }
+
   state.cart.push(p);
-  state.balance-=p.price;
+
+  state.balance -= p.price;
+
   render();
 }
+
 
 function cartDrawer(){
-  if(!state.cart.length)return "";
-  const total=state.cart.reduce((s,p)=>s+p.price,0);
-  return `<div class="cart-drawer"><div class="cart-head"><strong>${t("cart")} · ${state.cart.length}${t("items")}</strong><span>${money(state.balance)}</span></div><div class="cart-items">${state.cart.map(p=>`<div class="cart-item"><span>${p.brand} ${p.name}</span><strong>${money(p.price)}</strong></div>`).join("")}</div><div class="cart-total"><span>${t("total")}</span><span>${money(total)}</span></div><div class="cart-actions"><button onclick="resetDream()">${t("reset")}</button><button class="checkout" onclick="checkout()">${t("checkout")}</button></div></div>`;
+
+  if(!state.cart.length){
+    return "";
+  }
+
+  const total =
+    state.cart.reduce(
+      (s,p)=>s+p.price,
+      0
+    );
+
+  return `
+
+    <div class="cart-drawer">
+
+      <div class="cart-head">
+
+        <strong>
+          ${t("cart")} ·
+          ${state.cart.length}${t("items")}
+        </strong>
+
+        <span>
+          ${money(state.balance)}
+        </span>
+
+      </div>
+
+
+      <div class="cart-items">
+
+        ${
+          state.cart
+            .map(p => `
+
+              <div class="cart-item">
+
+                <span>
+                  ${p.brand} ${p.name}
+                </span>
+
+                <strong>
+                  ${money(p.price)}
+                </strong>
+
+              </div>
+
+            `)
+            .join("")
+        }
+
+      </div>
+
+
+      <div class="cart-total">
+
+        <span>
+          ${t("total")}
+        </span>
+
+        <span>
+          ${money(total)}
+        </span>
+
+      </div>
+
+
+      <div class="cart-actions">
+
+        <button onclick="resetDream()">
+          ${t("reset")}
+        </button>
+
+        <button
+          class="checkout"
+          onclick="checkout()"
+        >
+          ${t("checkout")}
+        </button>
+
+      </div>
+
+    </div>
+
+  `;
 }
 
+
 function resetDream(){
-  state.balance=750000000;
-  state.cart=[];
+
+  state.balance = 750000000;
+  state.cart = [];
+
   render();
 }
 
+
+/* =========================================================
+   CHECKOUT
+   ========================================================= */
+
 function checkout(){
-  const total=state.cart.reduce((s,p)=>s+p.price,0);
-  const modal=document.createElement("div");
-  modal.className="receipt";
-  modal.innerHTML=`<div class="receipt-card"><div class="eyebrow">THE LOTTERY</div><h2>${t("receipt")}</h2><p>${t("receiptText")}</p>${state.cart.map(p=>`<div class="receipt-line"><span>${p.brand} ${p.name}</span><strong>${money(p.price)}</strong></div>`).join("")}<div class="receipt-line"><strong>${t("total")}</strong><strong>${money(total)}</strong></div><p class="small">${t("remaining")}: ${money(state.balance)}</p><button class="add" onclick="this.closest('.receipt').remove()">${t("close")}</button></div>`;
+
+  const total =
+    state.cart.reduce(
+      (s,p)=>s+p.price,
+      0
+    );
+
+  const modal =
+    document.createElement("div");
+
+  modal.className = "receipt";
+
+
+  modal.innerHTML = `
+
+    <div class="receipt-card">
+
+      <div class="eyebrow">
+        THE LOTTERY
+      </div>
+
+      <h2>
+        ${t("receipt")}
+      </h2>
+
+      <p>
+        ${t("receiptText")}
+      </p>
+
+      ${
+        state.cart
+          .map(p => `
+
+            <div class="receipt-line">
+
+              <span>
+                ${p.brand} ${p.name}
+              </span>
+
+              <strong>
+                ${money(p.price)}
+              </strong>
+
+            </div>
+
+          `)
+          .join("")
+      }
+
+      <div class="receipt-line">
+
+        <strong>
+          ${t("total")}
+        </strong>
+
+        <strong>
+          ${money(total)}
+        </strong>
+
+      </div>
+
+      <p class="small">
+        ${t("remaining")}:
+        ${money(state.balance)}
+      </p>
+
+      <button
+        class="add"
+        onclick="this.closest('.receipt').remove()"
+      >
+        ${t("close")}
+      </button>
+
+    </div>
+
+  `;
+
+
   document.body.appendChild(modal);
 }
+
+
+/* =========================================================
+   START APP
+   ========================================================= */
 
 render();
