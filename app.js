@@ -845,16 +845,28 @@ function backToSeoul(){
   render();
 }
 
+
 function selectSeoulHotel(name, price){
-  state.selected = state.selected.filter(item => item.type !== "hotel");
+  state.selected = state.selected.filter(
+    item => item.type !== "hotel"
+  );
+
   state.selected.push({
     type: "hotel",
     name: name,
     price: price
   });
 
+  state.seoulPlanning = "stay";
   render();
+
+  alert(
+    name + " added to your dream weekend!\n\n" +
+    "Estimated price: ₩" + price.toLocaleString() +
+    " per night."
+  );
 }
+
 
 
 function startSeoulPlanning(){
