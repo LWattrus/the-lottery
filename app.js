@@ -768,6 +768,95 @@ function seoulPlannerScreen(){
   `;
 }
 
+
+function seoulHotelsScreen(){
+  const hotels = [
+    {
+      name: "Four Seasons Hotel Seoul",
+      area: "Gwanghwamun",
+      price: 650000,
+      description: "Refined luxury in the heart of historic Seoul.",
+      image: "https://images.unsplash.com/photo-1566073771259-6a8506099945"
+    },
+    {
+      name: "SIGNIEL Seoul",
+      area: "Jamsil",
+      price: 700000,
+      description: "A spectacular high-rise stay above the city.",
+      image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb"
+    },
+    {
+      name: "Josun Palace",
+      area: "Gangnam",
+      price: 600000,
+      description: "Contemporary Korean elegance and five-star comfort.",
+      image: "https://images.unsplash.com/photo-1582719508461-905c673771fd"
+    },
+    {
+      name: "The Shilla Seoul",
+      area: "Jangchung-dong",
+      price: 550000,
+      description: "Classic hospitality, beautiful grounds and fine dining.",
+      image: "https://images.unsplash.com/photo-1571896349842-33c89424de2d"
+    }
+  ];
+
+  return `
+    <section class="seoul-intro">
+      <div class="seoul-intro-label">YOUR SEOUL ESCAPE</div>
+      <h2>Find your perfect stay.</h2>
+      <p>Choose a hotel worthy of your dream weekend.</p>
+      <div class="seoul-budget">
+        <span>YOUR DREAM BUDGET</span>
+        <strong>₩${state.balance.toLocaleString()}</strong>
+      </div>
+      <button class="seoul-build-button" onclick="backToSeoul()">
+        ← BACK TO SEOUL
+      </button>
+    </section>
+
+    <section class="seoul-hotels">
+      ${hotels.map((hotel, index) => `
+        <article class="seoul-category">
+          <img
+            src="${hotel.image}"
+            alt="${hotel.name}"
+            style="width:100%;height:210px;object-fit:cover;"
+            loading="lazy"
+          >
+          <div class="seoul-category-number">
+            ${String(index + 1).padStart(2, "0")}
+          </div>
+          <h3>${hotel.name}</h3>
+          <p>${hotel.area}</p>
+          <p>${hotel.description}</p>
+          <p>From ₩${hotel.price.toLocaleString()} / night</p>
+          <button onclick="selectSeoulHotel('${hotel.name}', ${hotel.price})">
+            SELECT THIS STAY →
+          </button>
+        </article>
+      `).join("")}
+    </section>
+  `;
+}
+
+function backToSeoul(){
+  state.seoulPlanning = false;
+  render();
+}
+
+function selectSeoulHotel(name, price){
+  state.selected = state.selected.filter(item => item.type !== "hotel");
+  state.selected.push({
+    type: "hotel",
+    name: name,
+    price: price
+  });
+
+  render();
+}
+
+
 function startSeoulPlanning(){
   state.seoulPlanning = "stay";
   render();
