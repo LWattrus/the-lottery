@@ -82,7 +82,12 @@ function render(){
     return;
   }
 
-  if(state.destination === "seoul"){
+    if(state.destination === "seoul"){
+    if(state.seoulPlanning === "stay"){
+      app.innerHTML=seoulHotelsScreen();
+      return;
+    }
+
     app.innerHTML=seoulPlannerScreen();
     return;
   }
