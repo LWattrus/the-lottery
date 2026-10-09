@@ -1,2027 +1,240 @@
+/*
+ * THE LOTTERY — complete app.js replacement
+ * Front-end only. Product prices are illustrative estimates, not live quotes.
+ * Suggestion submissions are kept in this browser as pending and are not published.
+ */
+'use strict';
+
 const state = {
-  lang: localStorage.getItem("dreamLang") || null,
+  lang: localStorage.getItem('dreamLang') || null,
   agreed: false,
   balance: 750000000,
-  category: "all",
-  search: "",
-  cart: [],
   drawn: false,
   dream: false,
   destination: null,
-  seoulPlanning: false,
-  selected: []
+  seoulPlanning: null,
+  selected: [],
+  hotelNights: 2,
+  view: 'main',
+  notice: '',
+  suggestions: JSON.parse(localStorage.getItem('dreamSuggestions') || '[]'),
+  cart: [],
+  category: 'all',
+  search: ''
 };
+
+const WON = '₩';
+const money = n => WON + Math.round(Number(n) || 0).toLocaleString('en-US');
+const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => `${Date.now()}-${Math.random().toString(36).slice(2,8)}`;
 
 const T = {
   en: {
-    title:"THE LOTTERY", subtitle:"Win a fortune. Then decide what your life looks like.",
-    warningTitle:"Before you play", warning1:"This is a fictional simulation. No money, prizes, purchases or deliveries are real.",
-    warning2:"The products shown are real products, but this prototype does not sell them.",
-    warning3:"Prices are prototype game values and may not match current retail prices.",
-    agree:"I UNDERSTAND — LET'S PLAY", back:"BACK",
-    ticket:"YOUR LOTTERY TICKET", pick:"Choose six numbers. Make them yours.", selected:"selected",
-    draw:"DRAW THE NUMBERS", drawing:"DRAWING...", congrats:"CONGRATULATIONS",
-    won:"YOU WON", continue:"START MY DREAM", shopTitle:"WHAT ARE YOU GOING TO DO WITH IT?",
-    shopSub:"Spend your fictional fortune on real-world things you love.",
-    all:"Everything", beauty:"Beauty", electronics:"Electronics", fashion:"Fashion", lifestyle:"Lifestyle",
-    hotels:"Hotels", dining:"Dining", add:"ADD TO DREAM", cart:"YOUR DREAM", checkout:"CHECK OUT",
-    empty:"Your dream is empty.", total:"Total", remaining:"Remaining", receipt:"DREAM CONFIRMED",
-    receiptText:"Nothing was charged. Nothing will be delivered. This is your fictional dream.",
-    close:"CLOSE", search:"Search products...", items:"items", reset:"START OVER",
-    chooseSix:"Choose 6 numbers to continue.", lotteryReady:"YOUR NUMBERS"
+    chooseLanguage:'Choose your language', english:'English', korean:'한국어', continue:'Continue',
+    warningTitle:'A little dream. A little escape.', warning:'This is a fictional entertainment experience. No real money is spent, no lottery ticket is purchased, and no prize can be won. All budgets and prices are simulated.', agree:'I understand. Let me dream.',
+    ticketTitle:'What if tonight was your night?', ticketSubtitle:'Choose six numbers from 1 to 45.', selected:'selected', draw:'Draw my numbers', random:'Quick pick', reset:'Clear numbers',
+    dreamTitle:'Congratulations. You won!', dreamText:'In this imaginary world, you have', startDream:'Start my dream', dreamPicker:'What would you do with your dream money?', getaway:'Your perfect getaway', shopping:'Shop the world', home:'Buy your dream home', live:'Live the dream',
+    destinations:'Choose your destination', seoul:'Seoul', comingSoon:'Coming soon', back:'Back', homePage:'Seoul dream planner', tagline:'Your Seoul. Your rules. Your dream budget.',
+    stay:'Stay', dine:'Dine', experience:'Experience', shop:'Shop', move:'Move', itinerary:'My itinerary', remaining:'Budget remaining', spent:'Planned spend', add:'Add to itinerary', remove:'Remove', selectedItems:'Your selections', noItems:'Nothing planned yet. Explore a category to start building your dream trip.',
+    nights:'Nights', total:'Total', hotel:'Hotel', estimated:'Illustrative estimate', planTrip:'Build my Seoul trip', suggestionTitle:'Suggest a place or experience', suggestionText:'Have a great idea for Seoul? Send it for review. Suggestions stay private in this demo and are not published.', name:'Place or experience name', details:'Optional description', submitSuggestion:'Submit suggestion', pending:'Saved as pending review on this device.',
+    emptyName:'Please enter a name first.', budgetLow:'This selection is over your remaining budget.', added:'Added to your itinerary.', already:'This item is already in your itinerary.', clear:'Clear itinerary', confirmClear:'Remove every item from your itinerary?',
+    categories:{stay:'STAY',dine:'DINE',experience:'EXPERIENCE',shop:'SHOP',move:'MOVE'}, shopTitle:'Shop the dream', search:'Search products', addCart:'Add to bag', bag:'Your bag', checkout:'Dream checkout', emptyBag:'Your bag is empty.',
+    restart:'Start over', changeLanguage:'Language', all:'All', footer:'A fictional experience. Prices are estimates, not live offers.'
   },
-
   ko: {
-    title:"THE LOTTERY", subtitle:"당첨금을 받고, 내가 원하는 삶을 만들어 보세요.",
-    warningTitle:"게임을 시작하기 전에", warning1:"이 사이트는 가상 시뮬레이션입니다. 돈, 당첨금, 구매 및 배송은 실제가 아닙니다.",
-    warning2:"표시되는 상품과 장소는 실제 존재하지만, 이 프로토타입에서는 판매하지 않습니다.",
-    warning3:"가격은 게임용 예시 가격이며 실제 판매 가격과 다를 수 있습니다.",
-    agree:"확인했습니다 — 시작하기", back:"뒤로가기",
-    ticket:"나의 복권", pick:"직접 6개의 번호를 선택하세요.", selected:"선택",
-    draw:"번호 추첨하기", drawing:"추첨 중...", congrats:"축하합니다",
-    won:"당첨금", continue:"내 꿈 시작하기", shopTitle:"이 돈으로 무엇을 할까요?",
-    shopSub:"실제로 존재하는 상품과 장소로 나만의 꿈을 만들어 보세요.",
-    all:"전체", beauty:"뷰티", electronics:"전자제품", fashion:"패션", lifestyle:"라이프스타일",
-    hotels:"호텔", dining:"다이닝", add:"꿈에 담기", cart:"나의 꿈", checkout:"꿈 완성하기",
-    empty:"아직 담은 것이 없습니다.", total:"합계", remaining:"남은 금액", receipt:"꿈이 완성되었습니다",
-    receiptText:"실제 결제는 없으며 상품이 배송되지 않습니다. 이것은 가상의 꿈입니다.",
-    close:"닫기", search:"상품 검색...", items:"개", reset:"처음부터",
-    chooseSix:"6개의 번호를 선택해 주세요.", lotteryReady:"나의 번호"
+    chooseLanguage:'언어를 선택하세요', english:'English', korean:'한국어', continue:'계속',
+    warningTitle:'잠시 꿈꾸는 특별한 시간', warning:'이 사이트는 가상의 엔터테인먼트 경험입니다. 실제 돈을 사용하거나 복권을 구매하지 않으며, 실제 당첨금도 없습니다. 모든 예산과 가격은 가상입니다.', agree:'이해했습니다. 시작할게요.',
+    ticketTitle:'오늘 밤, 행운이 온다면?', ticketSubtitle:'1부터 45까지 숫자 6개를 선택하세요.', selected:'선택', draw:'번호 추첨하기', random:'자동 선택', reset:'초기화',
+    dreamTitle:'축하합니다! 당첨입니다!', dreamText:'이 가상 세계에서 당신의 당첨금은', startDream:'꿈 시작하기', dreamPicker:'당첨금으로 무엇을 하고 싶나요?', getaway:'완벽한 여행', shopping:'세계에서 쇼핑하기', home:'꿈의 집 구매하기', live:'꿈처럼 살기',
+    destinations:'여행지를 선택하세요', seoul:'서울', comingSoon:'준비 중', back:'뒤로', homePage:'서울 드림 플래너', tagline:'당신의 서울, 당신의 방식, 당신의 꿈 예산.',
+    stay:'숙박', dine:'식사', experience:'체험', shop:'쇼핑', move:'이동', itinerary:'내 일정', remaining:'남은 예산', spent:'예정 지출', nights:'숙박 일수', total:'합계', hotel:'호텔', estimated:'예상 가격',
+    add:'일정에 추가', remove:'삭제', selectedItems:'선택한 항목', noItems:'아직 계획이 없습니다. 카테고리를 선택해 여행을 만들어 보세요.', planTrip:'서울 여행 만들기',
+    suggestionTitle:'장소 또는 체험 추천하기', suggestionText:'서울의 좋은 아이디어가 있나요? 검토를 위해 보내 주세요. 이 데모에서는 추천 내용이 이 기기에만 저장되며 공개되지 않습니다.', name:'장소 또는 체험 이름', details:'설명 (선택 사항)', submitSuggestion:'추천 제출', pending:'검토 대기 상태로 이 기기에 저장했습니다.',
+    emptyName:'먼저 이름을 입력해 주세요.', budgetLow:'남은 예산보다 비싼 항목입니다.', added:'일정에 추가했습니다.', already:'이미 일정에 있는 항목입니다.', clear:'일정 비우기', confirmClear:'일정의 모든 항목을 삭제할까요?',
+    categories:{stay:'숙박',dine:'식사',experience:'체험',shop:'쇼핑',move:'이동'}, shopTitle:'꿈의 쇼핑', search:'상품 검색', addCart:'가방에 담기', bag:'쇼핑 가방', checkout:'가상 결제', emptyBag:'가방이 비어 있습니다.',
+    restart:'처음부터', changeLanguage:'언어', all:'전체', footer:'가상의 경험입니다. 가격은 실시간 상품 가격이 아닌 예상 금액입니다.'
   }
 };
+const t = key => {
+  const lang = T[state.lang] || T.en;
+  return key.split('.').reduce((obj,k)=>obj?.[k], lang) ?? key;
+};
 
-const money = n => "₩" + Math.round(n).toLocaleString("ko-KR");
-const t = k => T[state.lang || "en"][k] || k;
+// Curated sample options. Prices are estimates and can be edited here at any time.
+const SEOUL = {
+  stay: [
+    {id:'hotel-four-seasons',name:'Four Seasons Hotel Seoul',kind:'Luxury hotel',price:650000,unit:'night',area:'Gwanghwamun',desc:'Polished luxury, skyline views and a central location.',image:'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=900&q=80'},
+    {id:'hotel-signiel',name:'SIGNIEL Seoul',kind:'Luxury hotel',price:700000,unit:'night',area:'Jamsil',desc:'High-rise views over the city and the Han River.',image:'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=900&q=80'},
+    {id:'hotel-josun',name:'The Westin Josun Seoul',kind:'Luxury hotel',price:600000,unit:'night',area:'City Hall',desc:'Classic five-star comfort close to central Seoul.',image:'https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=900&q=80'},
+    {id:'hotel-park-hyatt',name:'Park Hyatt Seoul',kind:'Luxury hotel',price:550000,unit:'night',area:'Gangnam',desc:'Contemporary design in the heart of Gangnam.',image:'https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=900&q=80'}
+  ],
+  dine: [
+    {id:'dine-fine',name:'Luxury tasting-menu dinner',kind:'Fine dining',price:250000,unit:'person',area:'Gangnam / central Seoul',desc:'A special multi-course dinner for a memorable night.',image:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=900&q=80'},
+    {id:'dine-korean',name:'Modern Korean tasting menu',kind:'Korean cuisine',price:180000,unit:'person',area:'Jongno',desc:'Seasonal Korean ingredients in a refined setting.',image:'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=900&q=80'},
+    {id:'dine-rooftop',name:'Rooftop cocktail and dinner',kind:'Rooftop dining',price:150000,unit:'person',area:'Itaewon',desc:'City lights, a relaxed meal and a great view.',image:'https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=900&q=80'},
+    {id:'dine-cafe',name:'Designer café afternoon',kind:'Café',price:35000,unit:'visit',area:'Seongsu',desc:'Coffee, dessert and a slow afternoon.',image:'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=900&q=80'}
+  ],
+  experience: [
+    {id:'exp-spa',name:'Private luxury spa session',kind:'Wellness',price:220000,unit:'person',area:'Gangnam',desc:'A restorative spa visit and treatment.',image:'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=900&q=80'},
+    {id:'exp-hanbok',name:'Premium hanbok photoshoot',kind:'Culture',price:120000,unit:'session',area:'Gyeongbokgung',desc:'Traditional clothing and a guided photo session.',image:'https://images.unsplash.com/photo-1538485399081-7191377e8241?auto=format&fit=crop&w=900&q=80'},
+    {id:'exp-car',name:'Private driver for a half day',kind:'Private tour',price:280000,unit:'half day',area:'Seoul',desc:'Explore the city with a private driver.',image:'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=900&q=80'},
+    {id:'exp-show',name:'Premium concert or show budget',kind:'Entertainment',price:180000,unit:'ticket',area:'Seoul',desc:'A placeholder budget for a special live event.',image:'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=900&q=80'}
+  ],
+  shop: [
+    {id:'shop-fashion',name:'Designer fashion shopping budget',kind:'Fashion',price:500000,unit:'budget',area:'Cheongdam / Apgujeong',desc:'A flexible budget for a luxury shopping stop.',image:'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=900&q=80'},
+    {id:'shop-beauty',name:'K-beauty and skincare haul',kind:'Beauty',price:180000,unit:'budget',area:'Myeongdong',desc:'Skincare, beauty products and gifts.',image:'https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=900&q=80'},
+    {id:'shop-design',name:'Seongsu design stores',kind:'Lifestyle',price:150000,unit:'budget',area:'Seongsu',desc:'Independent labels, accessories and design finds.',image:'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=900&q=80'}
+  ],
+  move: [
+    {id:'move-taxi',name:'Premium taxi and local rides',kind:'Transport',price:100000,unit:'trip budget',area:'Seoul',desc:'A flexible budget for taxis and short rides.',image:'https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=900&q=80'},
+    {id:'move-airport',name:'Airport transfer',kind:'Transfer',price:90000,unit:'one way',area:'Incheon ↔ Seoul',desc:'Estimated private transfer budget for one journey.',image:'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=900&q=80'},
+    {id:'move-transit',name:'Transit card and subway budget',kind:'Public transport',price:30000,unit:'trip budget',area:'Seoul',desc:'An estimated budget for subway and bus journeys.',image:'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=900&q=80'}
+  ]
+};
 
-function setLang(lang){
-  state.lang = lang;
-  localStorage.setItem("dreamLang", lang);
-  render();
+function setNotice(message){ state.notice = message || ''; }
+function spendTotal(){ return state.selected.reduce((sum,item)=>sum + item.price * (item.category==='stay' ? state.hotelNights : 1),0); }
+function remaining(){ return state.balance - spendTotal(); }
+function selectedKey(category,id){ return `${category}:${id}`; }
+function isSelected(category,id){ return state.selected.some(item=>selectedKey(item.category,item.id)===selectedKey(category,id)); }
+function getSelected(category,id){ return state.selected.find(item=>selectedKey(item.category,item.id)===selectedKey(category,id)); }
+function categoryName(category){ return t(`categories.${category}`); }
+
+function brandBar(){
+  return `<header class="brand-bar"><button class="brand-mark" onclick="goSeoulHome()" aria-label="Seoul home">THE LOTTERY <span>✦</span></button><div class="brand-actions"><button class="text-button" onclick="showItinerary()">${escapeHTML(t('itinerary'))} · ${state.selected.length}</button><button class="text-button" onclick="changeLanguage()">${escapeHTML(t('changeLanguage'))}</button></div></header>`;
 }
-
-function render(){
-  const app = document.getElementById("app");
-
-  if(!state.lang){
-    app.innerHTML = languageScreen();
-    return;
-  }
-
-  if(!state.agreed){
-    app.innerHTML = warningScreen();
-    return;
-  }
-
-    if(!state.drawn){
-    app.innerHTML=ticketScreen();
-    return;
-  }
-
-  if(!state.dream){
-    app.innerHTML=dreamPickerScreen();
-    return;
-  }
-
-    if(state.destination === "seoul"){
-    if(state.seoulPlanning === "stay"){
-      app.innerHTML=seoulHotelsScreen();
-      return;
-    }
-
-    app.innerHTML=seoulPlannerScreen();
-    return;
-  }
-
-  app.innerHTML=destinationScreen();
-}
-
-
-/* =========================================================
-   DREAM PICKER
-   ========================================================= */
-
-function dreamPickerScreen(){
-  return `
-    <div class="luxury-dream-picker">
-
-      <div class="luxury-topbar">
-        <div class="luxury-wordmark">
-          <span>THE</span>
-          LOTTERY
-        </div>
-
-        <button
-          class="luxury-lang-toggle"
-          onclick="setLang(state.lang==='en'?'ko':'en')"
-        >
-          ${state.lang==='en'?'한국어':'English'}
-        </button>
-      </div>
-
-      <main class="luxury-content">
-
-        <div class="luxury-eyebrow">
-          ${state.lang==="ko" ? "당신의 새로운 삶" : "YOUR NEW LIFE"}
-        </div>
-
-        <h1>
-          ${
-            state.lang==="ko"
-            ? "어떤 꿈을 만들어 볼까요?"
-            : "WHAT'S YOUR DREAM?"
-          }
-        </h1>
-
-        <p class="luxury-intro">
-          ${
-            state.lang==="ko"
-            ? "이제 당신에게는 ₩750,000,000이 있습니다. 어떤 삶을 만들어 볼까요?"
-            : "You have ₩750,000,000. Now imagine the life you've always wanted."
-          }
-        </p>
-
-        <div class="fortune-display">
-
-          <span>
-            ${
-              state.lang==="ko"
-              ? "당신의 가상 재산"
-              : "YOUR FICTIONAL FORTUNE"
-            }
-          </span>
-
-          <strong>₩750,000,000</strong>
-
-        </div>
-
-
-        <section class="luxury-dream-grid">
-
-
-          <!-- PERFECT GETAWAY -->
-
-          <article
-            class="luxury-dream-card luxury-featured"
-            onclick="openGetaway()"
-          >
-
-            <div class="luxury-card-number">
-              01
-            </div>
-
-            <div class="luxury-card-image getaway-image">
-
-              <div class="luxury-image-overlay"></div>
-
-              <div class="luxury-card-image-text">
-                <span>
-                  ${state.lang==="ko" ? "여행" : "TRAVEL"}
-                </span>
-
-                <strong>
-                  THE WORLD
-                </strong>
-              </div>
-
-            </div>
-
-            <div class="luxury-card-content">
-
-              <div class="luxury-card-eyebrow">
-                ${state.lang==="ko" ? "완벽한 휴가" : "YOUR PERFECT GETAWAY"}
-              </div>
-
-              <h2>
-                ${
-                  state.lang==="ko"
-                  ? "세상 어디든 떠나보세요."
-                  : "GO ANYWHERE."
-                }
-              </h2>
-
-              <p>
-                ${
-                  state.lang==="ko"
-                  ? "항공권, 호텔, 다이닝, 쇼핑과 특별한 경험으로 꿈의 여행을 만들어 보세요."
-                  : "Fly somewhere extraordinary. Choose your hotel, dining, experiences and everything in between."
-                }
-              </p>
-
-              <div class="luxury-card-tags">
-                <span>FLIGHTS</span>
-                <span>HOTELS</span>
-                <span>DINING</span>
-                <span>EXPERIENCES</span>
-              </div>
-
-              <button class="luxury-card-button">
-                ${
-                  state.lang==="ko"
-                  ? "여행 시작하기"
-                  : "CHOOSE YOUR DESTINATION"
-                }
-                <span>→</span>
-              </button>
-
-            </div>
-
-          </article>
-
-
-          <!-- SHOP THE WORLD -->
-
-          <article class="luxury-dream-card">
-
-            <div class="luxury-card-number">
-              02
-            </div>
-
-            <div class="luxury-card-image shopping-image">
-
-              <div class="luxury-image-overlay"></div>
-
-              <div class="luxury-card-image-text">
-                <span>
-                  ${state.lang==="ko" ? "쇼핑" : "SHOPPING"}
-                </span>
-
-                <strong>
-                  THE WORLD
-                </strong>
-              </div>
-
-              <div class="coming-soon">
-                COMING SOON
-              </div>
-
-            </div>
-
-            <div class="luxury-card-content">
-
-              <div class="luxury-card-eyebrow">
-                ${state.lang==="ko" ? "세상의 모든 것" : "SHOP THE WORLD"}
-              </div>
-
-              <h2>
-                ${
-                  state.lang==="ko"
-                  ? "원하는 것은 무엇이든."
-                  : "BUY WHAT YOU WANT."
-                }
-              </h2>
-
-              <p>
-                ${
-                  state.lang==="ko"
-                  ? "패션, 시계, 전자제품, 뷰티와 럭셔리 아이템을 마음껏 담아보세요."
-                  : "Fashion, watches, technology, beauty and the things you've always wanted."
-                }
-              </p>
-
-              <div class="luxury-card-tags">
-                <span>FASHION</span>
-                <span>WATCHES</span>
-                <span>TECH</span>
-                <span>BEAUTY</span>
-              </div>
-
-            </div>
-
-          </article>
-
-
-          <!-- DREAM HOME -->
-
-          <article class="luxury-dream-card">
-
-            <div class="luxury-card-number">
-              03
-            </div>
-
-            <div class="luxury-card-image home-image">
-
-              <div class="luxury-image-overlay"></div>
-
-              <div class="luxury-card-image-text">
-                <span>
-                  ${state.lang==="ko" ? "부동산" : "REAL ESTATE"}
-                </span>
-
-                <strong>
-                  YOUR HOME
-                </strong>
-              </div>
-
-              <div class="coming-soon">
-                COMING SOON
-              </div>
-
-            </div>
-
-            <div class="luxury-card-content">
-
-              <div class="luxury-card-eyebrow">
-                ${state.lang==="ko" ? "꿈의 집" : "BUY YOUR DREAM HOME"}
-              </div>
-
-              <h2>
-                ${
-                  state.lang==="ko"
-                  ? "완벽한 집을 만들어 보세요."
-                  : "CREATE YOUR PERFECT HOME."
-                }
-              </h2>
-
-              <p>
-                ${
-                  state.lang==="ko"
-                  ? "꿈의 집, 인테리어, 가구, 자동차와 라이프스타일까지 상상해 보세요."
-                  : "Find your dream property, furnish it beautifully and build the lifestyle around it."
-                }
-              </p>
-
-              <div class="luxury-card-tags">
-                <span>PROPERTY</span>
-                <span>INTERIORS</span>
-                <span>FURNITURE</span>
-                <span>LIFESTYLE</span>
-              </div>
-
-            </div>
-
-          </article>
-
-
-          <!-- LIVE THE DREAM -->
-
-          <article class="luxury-dream-card">
-
-            <div class="luxury-card-number">
-              04
-            </div>
-
-            <div class="luxury-card-image lifestyle-image">
-
-              <div class="luxury-image-overlay"></div>
-
-              <div class="luxury-card-image-text">
-                <span>
-                  ${state.lang==="ko" ? "라이프스타일" : "LIFESTYLE"}
-                </span>
-
-                <strong>
-                  LIVE MORE
-                </strong>
-              </div>
-
-              <div class="coming-soon">
-                COMING SOON
-              </div>
-
-            </div>
-
-            <div class="luxury-card-content">
-
-              <div class="luxury-card-eyebrow">
-                ${state.lang==="ko" ? "꿈의 라이프스타일" : "LIVE THE DREAM"}
-              </div>
-
-              <h2>
-                ${
-                  state.lang==="ko"
-                  ? "돈으로 시간을 사세요."
-                  : "LIVE UNFORGETTABLY."
-                }
-              </h2>
-
-              <p>
-                ${
-                  state.lang==="ko"
-                  ? "최고의 다이닝, 엔터테인먼트, 자동차와 특별한 경험을 상상해 보세요."
-                  : "Cars, dining, entertainment, adventures and unforgettable experiences."
-                }
-              </p>
-
-              <div class="luxury-card-tags">
-                <span>CARS</span>
-                <span>DINING</span>
-                <span>ENTERTAINMENT</span>
-                <span>EXPERIENCES</span>
-              </div>
-
-            </div>
-
-          </article>
-
-        </section>
-
-
-        <div class="luxury-footer-note">
-
-          <span>THE LOTTERY</span>
-
-          <p>
-            ${
-              state.lang==="ko"
-              ? "당신의 꿈은 여기서 시작됩니다."
-              : "Your fortune. Your imagination. Your life."
-            }
-          </p>
-
-        </div>
-
-      </main>
-
-    </div>
-  `;
-}
-
-
-function openGetaway(){
-  state.dream = true;
-  state.destination = null;
-  render();
-}
-
-
-function destinationScreen(){
-
-  return `
-    <div class="luxury-destination">
-
-      <div class="luxury-topbar">
-
-        <button
-          class="luxury-back"
-          onclick="state.dream=false;state.destination=null;render()"
-        >
-          ←
-          ${
-            state.lang==="ko"
-            ? "뒤로"
-            : "BACK"
-          }
-        </button>
-
-        <div class="luxury-wordmark">
-          <span>THE</span>
-          LOTTERY
-        </div>
-
-        <button
-          class="luxury-lang-toggle"
-          onclick="setLang(state.lang==='en'?'ko':'en')"
-        >
-          ${state.lang==='en'?'한국어':'English'}
-        </button>
-
-      </div>
-
-
-      <main class="destination-content">
-
-        <div class="luxury-eyebrow">
-          ${
-            state.lang==="ko"
-            ? "완벽한 휴가"
-            : "YOUR PERFECT GETAWAY"
-          }
-        </div>
-
-        <h1>
-          ${
-            state.lang==="ko"
-            ? "어디로 떠날까요?"
-            : "WHERE WILL YOU GO?"
-          }
-        </h1>
-
-        <p>
-          ${
-            state.lang==="ko"
-            ? "꿈의 여행을 시작할 도시를 선택하세요."
-            : "Choose a destination for your dream escape."
-          }
-        </p>
-
-
-        <div class="destination-grid">
-
-
-          <article
-            class="destination-card seoul-destination"
-            onclick="selectDestination('seoul')"
-          >
-
-            <div class="destination-overlay"></div>
-
-            <div class="destination-info">
-
-              <span>01</span>
-
-              <small>ASIA</small>
-
-              <h2>SEOUL</h2>
-
-              <p>
-                ${
-                  state.lang==="ko"
-                  ? "완벽한 서울 주말"
-                  : "THE PERFECT WEEKEND"
-                }
-              </p>
-
-              <button>
-                ${
-                  state.lang==="ko"
-                  ? "선택하기"
-                  : "EXPLORE SEOUL"
-                }
-                →
-              </button>
-
-            </div>
-
-          </article>
-
-
-          <article class="destination-card new-york-destination">
-
-            <div class="destination-overlay"></div>
-
-            <div class="destination-info">
-
-              <span>02</span>
-
-              <small>NORTH AMERICA</small>
-
-              <h2>NEW YORK</h2>
-
-              <p>COMING SOON</p>
-
-            </div>
-
-          </article>
-
-
-          <article class="destination-card paris-destination">
-
-            <div class="destination-overlay"></div>
-
-            <div class="destination-info">
-
-              <span>03</span>
-
-              <small>EUROPE</small>
-
-              <h2>PARIS</h2>
-
-              <p>COMING SOON</p>
-
-            </div>
-
-          </article>
-
-
-          <article class="destination-card tokyo-destination">
-
-            <div class="destination-overlay"></div>
-
-            <div class="destination-info">
-
-              <span>04</span>
-
-              <small>ASIA</small>
-
-              <h2>TOKYO</h2>
-
-              <p>COMING SOON</p>
-
-            </div>
-
-          </article>
-
-
-          <article class="destination-card london-destination">
-
-            <div class="destination-overlay"></div>
-
-            <div class="destination-info">
-
-              <span>05</span>
-
-              <small>EUROPE</small>
-
-              <h2>LONDON</h2>
-
-              <p>COMING SOON</p>
-
-            </div>
-
-          </article>
-
-
-          <article class="destination-card dubai-destination">
-
-            <div class="destination-overlay"></div>
-
-            <div class="destination-info">
-
-              <span>06</span>
-
-              <small>MIDDLE EAST</small>
-
-              <h2>DUBAI</h2>
-
-              <p>COMING SOON</p>
-
-            </div>
-
-          </article>
-
-        </div>
-
-      </main>
-
-    </div>
-  `;
-}
-
-
-function selectDestination(destination){
-
-  state.destination = destination;
-
-  render();
-
-}
-
-
-function seoulPlannerScreen(){
-  return `
-    <section class="seoul-hero">
-
-      <div class="seoul-atmosphere"></div>
-
-      <div class="seoul-hero-content">
-
-        <div class="seoul-kicker">
-          SEOUL · 서울
-        </div>
-
-        <div class="seoul-divider">
-          <span></span>
-          <b>✦</b>
-          <span></span>
-        </div>
-
-        <h1>
-          THE PERFECT<br>
-          WEEKEND
-        </h1>
-
-        <p class="seoul-subtitle">
-          Three days. One extraordinary city.
-        </p>
-
-        <div class="seoul-budget">
-          <span>YOUR DREAM BUDGET</span>
-          <strong>₩${state.balance.toLocaleString()}</strong>
-        </div>
-
-        <button class="seoul-build-button" onclick="startSeoulPlanning()">
-          BUILD MY WEEKEND
-          <span>→</span>
-        </button>
-
-      </div>
-
-      <div class="seoul-scroll">
-        <span>EXPLORE SEOUL</span>
-        <i></i>
-      </div>
-
-    </section>
-
-    <section class="seoul-intro">
-
-      <div class="seoul-intro-label">
-        YOUR SEOUL ESCAPE
-      </div>
-
-      <h2>
-        Imagine the weekend<br>
-        you've always wanted.
-      </h2>
-
-      <p>
-        Choose where you stay, where you dine, what you experience
-        and how you spend your dream budget.
-      </p>
-
-    </section>
-
-    <section class="seoul-categories">
-
-      <div class="seoul-category">
-        <div class="seoul-category-number">01</div>
-        <h3>STAY</h3>
-        <p>Hotels worthy of the weekend.</p>
-        <button onclick="startSeoulPlanning()">EXPLORE →</button>
-      </div>
-
-      <div class="seoul-category">
-        <div class="seoul-category-number">02</div>
-        <h3>DINE</h3>
-        <p>Seoul's finest tables.</p>
-        <button onclick="startSeoulPlanning()">EXPLORE →</button>
-      </div>
-
-      <div class="seoul-category">
-        <div class="seoul-category-number">03</div>
-        <h3>EXPERIENCE</h3>
-        <p>Culture, adventure and unforgettable moments.</p>
-        <button onclick="startSeoulPlanning()">EXPLORE →</button>
-      </div>
-
-      <div class="seoul-category">
-        <div class="seoul-category-number">04</div>
-        <h3>SHOP</h3>
-        <p>From Korean designers to global luxury.</p>
-        <button onclick="startSeoulPlanning()">EXPLORE →</button>
-      </div>
-
-      <div class="seoul-category">
-        <div class="seoul-category-number">05</div>
-        <h3>MOVE</h3>
-        <p>Travel Seoul in comfort.</p>
-        <button onclick="startSeoulPlanning()">EXPLORE →</button>
-      </div>
-
-    </section>
-
-    <section class="seoul-footer-line">
-      <span></span>
-      <p>SEOUL · 서울</p>
-      <span></span>
-    </section>
-  `;
-}
-
-
-function seoulHotelsScreen(){
-  const hotels = [
-    {
-      name: "Four Seasons Hotel Seoul",
-      area: "Gwanghwamun",
-      price: 650000,
-      description: "Refined luxury in the heart of historic Seoul.",
-      image: "https://images.unsplash.com/photo-1566073771259-6a8506099945"
-    },
-    {
-      name: "SIGNIEL Seoul",
-      area: "Jamsil",
-      price: 700000,
-      description: "A spectacular high-rise stay above the city.",
-      image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb"
-    },
-    {
-      name: "Josun Palace",
-      area: "Gangnam",
-      price: 600000,
-      description: "Contemporary Korean elegance and five-star comfort.",
-      image: "https://images.unsplash.com/photo-1582719508461-905c673771fd"
-    },
-    {
-      name: "The Shilla Seoul",
-      area: "Jangchung-dong",
-      price: 550000,
-      description: "Classic hospitality, beautiful grounds and fine dining.",
-      image: "https://images.unsplash.com/photo-1571896349842-33c89424de2d"
-    }
-  ];
-
-  return `
-    <section class="seoul-intro">
-      <div class="seoul-intro-label">YOUR SEOUL ESCAPE</div>
-      <h2>Find your perfect stay.</h2>
-      <p>Choose a hotel worthy of your dream weekend.</p>
-      <div class="seoul-budget">
-        <span>YOUR DREAM BUDGET</span>
-        <strong>₩${state.balance.toLocaleString()}</strong>
-      </div>
-      <button class="seoul-build-button" onclick="backToSeoul()">
-        ← BACK TO SEOUL
-      </button>
-    </section>
-
-    <section class="seoul-hotels">
-      ${hotels.map((hotel, index) => `
-        <article class="seoul-category">
-          <img
-            src="${hotel.image}"
-            alt="${hotel.name}"
-            style="width:100%;height:210px;object-fit:cover;"
-            loading="lazy"
-          >
-          <div class="seoul-category-number">
-            ${String(index + 1).padStart(2, "0")}
-          </div>
-          <h3>${hotel.name}</h3>
-          <p>${hotel.area}</p>
-          <p>${hotel.description}</p>
-          <p>From ₩${hotel.price.toLocaleString()} / night</p>
-          <button onclick="selectSeoulHotel('${hotel.name}', ${hotel.price})">
-            SELECT THIS STAY →
-          </button>
-        </article>
-      `).join("")}
-    </section>
-  `;
-}
-
-function backToSeoul(){
-  state.seoulPlanning = false;
-  render();
-}
-
-
-function selectSeoulHotel(name, price){
-  state.selected = state.selected.filter(
-    item => item.type !== "hotel"
-  );
-
-  state.selected.push({
-    type: "hotel",
-    name: name,
-    price: price
-  });
-
-  state.seoulPlanning = "stay";
-  render();
-
-  alert(
-    name + " added to your dream weekend!\n\n" +
-    "Estimated price: ₩" + price.toLocaleString() +
-    " per night."
-  );
-}
-
-
-
-function startSeoulPlanning(){
-  state.seoulPlanning = "stay";
-  render();
-}
-
-/* =========================================================
-   LANGUAGE SCREEN
-   ========================================================= */
-
 function languageScreen(){
-  return `
-    <div class="screen language-screen center">
-      <div class="lang-card">
-
-        <div class="eyebrow">
-          DREAM LIFE
-        </div>
-
-        <div class="logo">
-          THE<br>LOTTERY
-        </div>
-
-        <p class="subtitle">
-          Choose your language / 언어를 선택하세요
-        </p>
-
-        <div class="lang-buttons">
-
-          <button onclick="setLang('en')">
-            🇬🇧 English
-          </button>
-
-          <button onclick="setLang('ko')">
-            🇰🇷 한국어
-          </button>
-
-        </div>
-
-      </div>
-    </div>
-  `;
+  return `<main class="center-screen luxury-screen"><div class="eyebrow">THE LOTTERY</div><h1>${t('chooseLanguage')}</h1><div class="language-options"><button class="luxury-button" onclick="chooseLanguage('en')">English</button><button class="luxury-button" onclick="chooseLanguage('ko')">한국어</button></div></main>`;
 }
-
-
-/* =========================================================
-   WARNING SCREEN
-   ========================================================= */
-
 function warningScreen(){
-  return `
-    <div class="screen language-screen center">
-
-      <div class="lang-card">
-
-        <div class="eyebrow">
-          THE LOTTERY
-        </div>
-
-        <h2>
-          ${t("warningTitle")}
-        </h2>
-
-        <div class="warning">
-
-          <ul>
-            <li>${t("warning1")}</li>
-            <li>${t("warning2")}</li>
-            <li>${t("warning3")}</li>
-          </ul>
-
-          <div class="warning-actions">
-
-            <button
-              class="primary"
-              onclick="state.agreed=true;render()"
-            >
-              ${t("agree")}
-            </button>
-
-            <button
-              class="secondary"
-              onclick="state.lang=null;localStorage.removeItem('dreamLang');render()"
-            >
-              ${t("back")}
-            </button>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-  `;
+  return `<main class="center-screen luxury-screen"><div class="eyebrow">A DREAM, NOT REAL MONEY</div><h1>${t('warningTitle')}</h1><p class="lead">${t('warning')}</p><button class="gold-button" onclick="acceptWarning()">${t('agree')}</button></main>`;
 }
-
-
-/* =========================================================
-   LOTTERY
-   ========================================================= */
-
-const ballColor = n =>
-  n <= 10 ? "yellow" :
-  n <= 20 ? "blue" :
-  n <= 30 ? "red" :
-  n <= 40 ? "gray" :
-  "green";
-
-
-function lottoMark(n, extra=""){
-  return `
-    <button
-      class="lotto-mark ${extra}"
-      onclick="toggleNumber(${n})"
-      aria-label="Number ${n}"
-      aria-pressed="${extra.includes("selected") ? "true" : "false"}"
-    >
-      <span>${n}</span>
-    </button>
-  `;
-}
-
-
 function ticketScreen(){
-
-  const selected = state.selected;
-
-  return `
-    <div class="hero">
-
-      <div class="topbar">
-
-        <div class="wordmark">
-          ${t("title")}
-        </div>
-
-        <button
-          class="lang-toggle"
-          onclick="setLang(state.lang==='en'?'ko':'en')"
-        >
-          ${state.lang==='en'?'🇰🇷 한국어':'🇬🇧 English'}
-        </button>
-
-      </div>
-
-      <div class="hero-main">
-
-        <div class="ticket-wrap">
-
-          <div class="eyebrow">
-            DREAM LIFE
-          </div>
-
-          <h1>
-            ${t("ticket")}
-          </h1>
-
-          <div class="ticket korean-ticket">
-
-            <div class="ticket-brand">
-              <span>동행복권</span>
-              <strong>
-                Lotto <b>6/45</b>
-              </strong>
-            </div>
-
-            <div class="ticket-price">
-              ₩1,000 <span>GAME</span>
-            </div>
-
-            <p class="ticket-instruction">
-              ${t("pick")}
-            </p>
-
-            <div class="selected-label">
-              ${t("lotteryReady")}:
-              <strong>${selected.length}/6</strong>
-            </div>
-
-            <div class="selected-balls selected-marks">
-
-              ${
-                selected.map(n =>
-                  lottoMark(n,"selected chosen")
-                ).join("")
-                ||
-                `<span class="empty-selection">
-                  ${
-                    state.lang==='ko'
-                    ? '번호를 선택하세요'
-                    : 'Choose your numbers'
-                  }
-                </span>`
-              }
-
-            </div>
-
-            <div class="number-grid lotto-grid">
-
-              ${
-                Array.from(
-                  {length:45},
-                  (_,i)=>i+1
-                )
-                .map(n =>
-                  lottoMark(
-                    n,
-                    selected.includes(n)
-                    ? "selected"
-                    : ""
-                  )
-                )
-                .join("")
-              }
-
-            </div>
-
-            <div class="ticket-bottom">
-
-              <span>
-                ● ${state.lang==='ko'?'수동 선택':'MANUAL'}
-              </span>
-
-              <span>
-                ${selected.length}/6
-              </span>
-
-            </div>
-
-            <div
-              class="draw-area"
-              id="drawArea"
-            ></div>
-
-            <button
-              class="draw-button"
-              id="drawBtn"
-              onclick="drawLottery()"
-              ${selected.length!==6 ? "disabled" : ""}
-            >
-              ${t("draw")}
-            </button>
-
-            ${
-              selected.length!==6
-              ? `<div class="choose-note">${t("chooseSix")}</div>`
-              : ""
-            }
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-  `;
+  const balls=Array.from({length:45},(_,i)=>i+1).map(n=>`<button class="lotto-ball ${state.lottoNumbers?.includes(n)?'chosen':''}" onclick="toggleNumber(${n})">${n}</button>`).join('');
+  return `${brandBar()}<main class="lottery-screen"><div class="eyebrow">YOUR IMAGINATION STARTS HERE</div><h1>${t('ticketTitle')}</h1><p>${t('ticketSubtitle')}</p><div class="lotto-grid">${balls}</div><p class="muted">${state.lottoNumbers?.length||0} / 6 ${t('selected')}</p><div class="button-row"><button class="outline-button" onclick="quickPick()">${t('random')}</button><button class="outline-button" onclick="clearNumbers()">${t('reset')}</button><button class="gold-button" ${state.lottoNumbers?.length!==6?'disabled':''} onclick="drawNumbers()">${t('draw')}</button></div></main>`;
 }
-
-
-function toggleNumber(n){
-
-  if(state.selected.includes(n)){
-
-    state.selected =
-      state.selected.filter(x => x !== n);
-
-  } else if(state.selected.length < 6){
-
-    state.selected =
-      [...state.selected,n].sort((a,b)=>a-b);
-
-  }
-
-  render();
+function dreamPickerScreen(){
+  return `${brandBar()}<main class="dream-picker"><div class="eyebrow">THE IMAGINARY JACKPOT</div><h1>${t('dreamTitle')}</h1><p class="lead">${t('dreamText')}</p><div class="jackpot-amount">${money(state.balance)}</div><h2>${t('dreamPicker')}</h2><div class="dream-cards"><button class="dream-card" onclick="chooseDream('getaway')"><span>✦</span><h3>${t('getaway')}</h3><p>Build your perfect trip, one unforgettable choice at a time.</p></button><button class="dream-card" onclick="chooseDream('shop')"><span>◇</span><h3>${t('shopping')}</h3><p>Make room for the things you have always wanted.</p></button><button class="dream-card disabled-card" onclick="comingSoon()"><span>⌂</span><h3>${t('home')}</h3><p>${t('comingSoon')}</p></button><button class="dream-card disabled-card" onclick="comingSoon()"><span>∞</span><h3>${t('live')}</h3><p>${t('comingSoon')}</p></button></div><button class="gold-button" onclick="startDream()">${t('startDream')}</button></main>`;
 }
-
-
-/* =========================================================
-   LOTTERY DRAW ANIMATION
-   ========================================================= */
-
-function drawLottery(){
-
-  if(state.selected.length !== 6){
-    return;
-  }
-
-  const btn = document.getElementById("drawBtn");
-  const area = document.getElementById("drawArea");
-
-  if(!btn || !area){
-    return;
-  }
-
-  btn.disabled = true;
-  btn.style.display = "none";
-
-
-  /* Add draw animation CSS once */
-
-  if(!document.getElementById("lottery-draw-animation-style")){
-
-    const style = document.createElement("style");
-
-    style.id = "lottery-draw-animation-style";
-
-    style.textContent = `
-
-      .lottery-draw-stage{
-        margin:24px auto 10px;
-        padding:22px 12px 18px;
-        background:#ffffff;
-        border:2px solid #222;
-        border-radius:16px;
-        text-align:center;
-        overflow:hidden;
-      }
-
-      .lottery-draw-title{
-        font-size:13px;
-        font-weight:900;
-        letter-spacing:.08em;
-        margin-bottom:18px;
-        color:#222;
-      }
-
-      .lottery-machine{
-        width:150px;
-        height:92px;
-        margin:0 auto 22px;
-        border:4px solid #222;
-        border-radius:80px 80px 20px 20px;
-        background:
-          radial-gradient(
-            circle at 50% 30%,
-            #ffffff 0%,
-            #f5f5f5 55%,
-            #d9d9d9 100%
-          );
-        position:relative;
-        box-shadow:
-          inset 0 -9px 0 rgba(0,0,0,.08),
-          0 4px 0 rgba(0,0,0,.12);
-      }
-
-      .lottery-machine:before{
-        content:"";
-        position:absolute;
-        width:80px;
-        height:15px;
-        left:50%;
-        top:14px;
-        transform:translateX(-50%);
-        border-radius:50%;
-        background:rgba(255,255,255,.8);
-      }
-
-      .machine-window{
-        position:absolute;
-        left:50%;
-        bottom:-18px;
-        transform:translateX(-50%);
-        width:48px;
-        height:42px;
-        border:4px solid #222;
-        border-radius:8px 8px 18px 18px;
-        background:#fff;
-      }
-
-      .machine-window:after{
-        content:"";
-        position:absolute;
-        left:50%;
-        top:-15px;
-        transform:translateX(-50%);
-        width:13px;
-        height:13px;
-        background:#222;
-        border-radius:50%;
-      }
-
-      .draw-ball-row{
-        min-height:68px;
-        display:flex;
-        justify-content:center;
-        align-items:center;
-        gap:8px;
-        flex-wrap:wrap;
-        padding-top:4px;
-      }
-
-      .draw-ball-animated{
-        width:50px;
-        height:50px;
-        min-width:50px;
-        border-radius:50%;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        font-size:18px;
-        font-weight:900;
-        color:#111;
-        border:3px solid rgba(0,0,0,.35);
-        box-shadow:
-          0 5px 0 rgba(0,0,0,.18),
-          inset 3px 3px 8px rgba(255,255,255,.75);
-        animation:
-          lotteryBallIn .7s cubic-bezier(.2,.9,.25,1.3) both;
-      }
-
-      .draw-ball-animated.yellow{
-        background:#f4d35e;
-      }
-
-      .draw-ball-animated.blue{
-        background:#4c8eda;
-        color:white;
-      }
-
-      .draw-ball-animated.red{
-        background:#e74c3c;
-        color:white;
-      }
-
-      .draw-ball-animated.gray{
-        background:#b9b9b9;
-      }
-
-      .draw-ball-animated.green{
-        background:#58b957;
-        color:white;
-      }
-
-      .draw-ball-animated.latest{
-        animation:
-          lotteryBallIn .7s cubic-bezier(.2,.9,.25,1.3) both,
-          lotteryBallPulse .55s ease-out .7s;
-      }
-
-      .draw-status{
-        margin-top:14px;
-        font-size:12px;
-        font-weight:800;
-        letter-spacing:.05em;
-        color:#555;
-      }
-
-      @keyframes lotteryBallIn{
-
-        0%{
-          opacity:0;
-          transform:
-            translateY(-70px)
-            scale(.35)
-            rotate(-25deg);
-        }
-
-        55%{
-          opacity:1;
-          transform:
-            translateY(10px)
-            scale(1.08)
-            rotate(8deg);
-        }
-
-        78%{
-          transform:
-            translateY(-5px)
-            scale(.96)
-            rotate(-3deg);
-        }
-
-        100%{
-          opacity:1;
-          transform:
-            translateY(0)
-            scale(1)
-            rotate(0);
-        }
-
-      }
-
-      @keyframes lotteryBallPulse{
-
-        0%{
-          transform:scale(1);
-        }
-
-        50%{
-          transform:scale(1.15);
-        }
-
-        100%{
-          transform:scale(1);
-        }
-
-      }
-
-      @media(max-width:480px){
-
-        .lottery-draw-stage{
-          padding:18px 7px 15px;
-        }
-
-        .lottery-machine{
-          width:130px;
-          height:78px;
-        }
-
-        .draw-ball-row{
-          gap:6px;
-        }
-
-        .draw-ball-animated{
-          width:45px;
-          height:45px;
-          min-width:45px;
-          font-size:16px;
-        }
-
-      }
-
-      @media(prefers-reduced-motion:reduce){
-
-        .draw-ball-animated{
-          animation:none !important;
-          opacity:1;
-          transform:none;
-        }
-
-      }
-
-    `;
-
-    document.head.appendChild(style);
-  }
-
-
-  /* Draw screen */
-
-  area.innerHTML = `
-
-    <div class="lottery-draw-stage">
-
-      <div class="lottery-draw-title">
-        ${
-          state.lang==="ko"
-          ? "나의 번호를 추첨하고 있습니다..."
-          : "YOUR NUMBERS ARE BEING DRAWN..."
-        }
-      </div>
-
-      <div class="lottery-machine">
-
-        <div class="machine-window"></div>
-
-      </div>
-
-      <div
-        class="draw-ball-row"
-        id="drawBallRow"
-      ></div>
-
-      <div
-        class="draw-status"
-        id="drawStatus"
-      >
-        1 / 6
-      </div>
-
-    </div>
-
-  `;
-
-
-  const row =
-    document.getElementById("drawBallRow");
-
-  const status =
-    document.getElementById("drawStatus");
-
-
-  /* Draw the six selected numbers */
-
-  state.selected.forEach((n,i)=>{
-
-    setTimeout(()=>{
-
-      const ball =
-        document.createElement("div");
-
-      ball.className =
-        `draw-ball-animated ${ballColor(n)} latest`;
-
-      ball.textContent = n;
-
-      ball.setAttribute(
-        "aria-label",
-        `Drawn number ${n}`
-      );
-
-      row.appendChild(ball);
-
-      if(status){
-        status.textContent =
-          `${i+1} / 6`;
-      }
-
-      setTimeout(()=>{
-        ball.classList.remove("latest");
-      },1200);
-
-    }, i * 900);
-
-  });
-
-
-  /* Show winning screen after all balls */
-
-  setTimeout(
-    showWin,
-    state.selected.length * 900 + 1300
-  );
+function destinationScreen(){
+  return `${brandBar()}<main class="destination-screen"><div class="eyebrow">YOUR PERFECT GETAWAY</div><h1>${t('destinations')}</h1><div class="destination-grid"><button class="destination-card seoul-card" onclick="selectDestination('seoul')"><span class="destination-label">AVAILABLE NOW</span><h2>SEOUL</h2><p>Luxury, culture, food and unforgettable nights.</p><span class="destination-arrow">↗</span></button>${['NEW YORK','PARIS','TOKYO','LONDON','DUBAI'].map(name=>`<button class="destination-card unavailable" onclick="comingSoon()"><span class="destination-label">${t('comingSoon')}</span><h2>${name}</h2><p>More dream destinations are on the way.</p></button>`).join('')}</div></main>`;
 }
-
-
-/* =========================================================
-   WIN SCREEN
-   ========================================================= */
-
-function showWin(){
-
-  const el =
-    document.createElement("div");
-
-  el.className = "win";
-
-
-  /*
-    IMPORTANT:
-    The win overlay is attached directly to the body.
-    Therefore the button must remove the overlay before
-    rendering the Dream Picker.
-  */
-
-  el.innerHTML = `
-
-    <div class="win-card">
-
-      <div class="eyebrow">
-        ${t("congrats")}
-      </div>
-
-      <h1>
-        ${t("won")}
-      </h1>
-
-      <div
-        class="win-amount"
-        id="winAmount"
-      >
-        ₩0
-      </div>
-
-      <div class="bank-count">
-        ${t("remaining")}:
-        <strong>
-          ₩750,000,000
-        </strong>
-      </div>
-
-      <button
-        class="primary"
-        onclick="
-          this.closest('.win').remove();
-          state.drawn=true;
-          state.dream=false;
-          render();
-        "
-      >
-        ${t("continue")}
-      </button>
-
-    </div>
-
-  `;
-
-  document.body.appendChild(el);
-
-
-  /* Count the money up */
-
-  let start = 0;
-  const target = 750000000;
-  const dur = 2200;
-  let startTime = null;
-
-
-  const tick = ts => {
-
-    if(!startTime){
-      startTime = ts;
-    }
-
-    const p =
-      Math.min(
-        (ts-startTime)/dur,
-        1
-      );
-
-    const eased =
-      1-Math.pow(1-p,3);
-
-    const amount =
-      start +
-      (target-start)*eased;
-
-    const amountEl =
-      document.getElementById("winAmount");
-
-    if(amountEl){
-      amountEl.textContent =
-        money(amount);
-    }
-
-    if(p < 1){
-      requestAnimationFrame(tick);
-    }
-
-  };
-
-
-  requestAnimationFrame(tick);
+function seoulPlannerScreen(){
+  return `${brandBar()}<main class="seoul-home"><section class="seoul-hero"><div class="hero-overlay"><div class="eyebrow">YOUR PRIVATE SEOUL EDIT</div><h1>SEOUL,<br><em>YOUR WAY.</em></h1><p>${t('tagline')}</p><button class="gold-button" onclick="showItinerary()">${t('planTrip')} ↗</button></div></section><section class="budget-strip"><div><span>${t('remaining')}</span><strong>${money(remaining())}</strong></div><div><span>${t('spent')}</span><strong>${money(spendTotal())}</strong></div><div><span>${t('itinerary')}</span><strong>${state.selected.length} ${state.lang==='ko'?'개':'items'}</strong></div></section><section class="category-section"><div class="section-heading"><div><div class="eyebrow">MAKE IT YOURS</div><h2>Choose your Seoul</h2></div><button class="text-button" onclick="showItinerary()">View itinerary ↗</button></div><div class="category-tiles">${['stay','dine','experience','shop','move'].map((cat,i)=>`<button class="category-tile tile-${cat}" onclick="openCategory('${cat}')"><span class="tile-number">0${i+1}</span><span class="tile-title">${categoryName(cat)}</span><span class="tile-arrow">↗</span></button>`).join('')}</div></section><section class="suggestion-panel"><div><div class="eyebrow">YOUR LOCAL KNOWLEDGE</div><h2>${t('suggestionTitle')}</h2><p>${t('suggestionText')}</p></div><form class="suggestion-form" onsubmit="submitSuggestion(event)"><input id="suggestion-name" maxlength="100" placeholder="${t('name')}" required><textarea id="suggestion-details" maxlength="600" placeholder="${t('details')}"></textarea><button class="outline-button" type="submit">${t('submitSuggestion')} ↗</button></form></section></main>${noticeBar()}${footer()}`;
 }
-
-
-/* =========================================================
-   SHOP
-   ========================================================= */
-
-const labels = {
-  all:"all",
-  beauty:"beauty",
-  electronics:"electronics",
-  fashion:"fashion",
-  lifestyle:"lifestyle",
-  hotels:"hotels",
-  dining:"dining"
-};
-
-
-function filtered(){
-
-  const q =
-    state.search.toLowerCase();
-
-  return PRODUCTS.filter(p =>
-
-    (state.category==="all" ||
-     p.cat===state.category)
-
-    &&
-
-    (
-      !q ||
-      `${p.brand} ${p.name} ${p.ko}`
-      .toLowerCase()
-      .includes(q)
-    )
-
-  );
+function noticeBar(){ return state.notice?`<div class="notice-toast" role="status">${escapeHTML(state.notice)}<button onclick="setNotice('');render()" aria-label="Close">×</button></div>`:''; }
+function footer(){ return `<footer class="site-footer">${t('footer')} <button class="text-button" onclick="restartApp()">${t('restart')}</button></footer>`; }
+function openCategory(category){ state.seoulPlanning=category; state.view='category'; setNotice(''); render(); window.scrollTo(0,0); }
+function seoulCategoryScreen(category){
+  const items=SEOUL[category]||[];
+  const isStay=category==='stay';
+  return `${brandBar()}<main class="category-page"><button class="back-link" onclick="goSeoulHome()">← ${t('back')} / SEOUL</button><div class="eyebrow">SEOUL · ${categoryName(category)}</div><h1>${categoryName(category)}<span class="title-period">.</span></h1><p class="lead">${categoryIntro(category)}</p>${isStay?`<div class="nights-control"><label for="hotel-nights">${t('nights')}</label><button onclick="changeNights(-1)" aria-label="Fewer nights">−</button><strong id="nights-count">${state.hotelNights}</strong><button onclick="changeNights(1)" aria-label="More nights">+</button><span>${state.lang==='ko'?'박 기준':'nights for selected hotel'}</span></div>`:''}<div class="budget-strip compact"><div><span>${t('remaining')}</span><strong>${money(remaining())}</strong></div><div><span>${t('spent')}</span><strong>${money(spendTotal())}</strong></div></div><div class="option-grid">${items.map(item=>optionCard(item,category)).join('')}</div><section class="inline-itinerary"><h2>${t('selectedItems')}</h2>${state.selected.length?selectedList(true):`<p>${t('noItems')}</p>`}<button class="gold-button" onclick="showItinerary()">${t('itinerary')} ↗</button></section></main>${noticeBar()}${footer()}`;
 }
-
-
-function productCard(p){
-
-  const initials =
-    p.brand
-      .split(/\s+/)
-      .map(x=>x[0])
-      .slice(0,2)
-      .join("")
-      .toUpperCase();
-
-  return `
-
-    <article class="product">
-
-      <div class="product-art">
-
-        <div class="product-cat">
-          ${t(p.cat)}
-        </div>
-
-        <span>
-          ${initials}
-        </span>
-
-      </div>
-
-      <div class="product-info">
-
-        <div class="brand">
-          ${p.brand}
-        </div>
-
-        <div class="product-name">
-          ${p.name}
-        </div>
-
-        <div class="product-ko">
-          ${p.ko}
-        </div>
-
-        <div class="price">
-          ${money(p.price)}
-        </div>
-
-        <button
-          class="add"
-          onclick="addToCart('${p.id}')"
-        >
-          ${t("add")}
-        </button>
-
-      </div>
-
-    </article>
-
-  `;
+function categoryIntro(category){
+ const intros={stay:'Find a place that makes the whole trip feel special.',dine:'Plan a memorable meal, from Korean flavours to rooftop evenings.',experience:'Give your trip a moment you will remember.',shop:'Set aside a dream budget for Seoul’s style and design.',move:'Make getting around the city feel easy.'};
+ return intros[category]||'';
 }
-
-
+function optionCard(item,category){
+ const picked=isSelected(category,item.id), amount=item.price*(category==='stay'?state.hotelNights:1);
+ return `<article class="option-card"><div class="option-image-wrap"><img class="option-image" src="${escapeHTML(item.image)}" alt="${escapeHTML(item.name)}" loading="lazy" onerror="this.style.display='none'"><span class="option-kind">${escapeHTML(item.kind)}</span></div><div class="option-content"><div class="option-area">${escapeHTML(item.area)}</div><h2>${escapeHTML(item.name)}</h2><p>${escapeHTML(item.desc)}</p><div class="option-bottom"><div><strong>${money(amount)}</strong><small>${category==='stay'?`${money(item.price)} / night × ${state.hotelNights} ${t('nights')}`:`${t('estimated')} · ${escapeHTML(item.unit)}`}</small></div><button class="${picked?'selected-button':'outline-button'}" onclick="${picked?`removeItem('${category}','${item.id}')`:`addItem('${category}','${item.id}')`}">${picked?t('remove'):t('add')}</button></div></div></article>`;
+}
+function selectedList(compact=false){
+ if(!state.selected.length)return `<p>${t('noItems')}</p>`;
+ return `<div class="selected-list">${state.selected.map(item=>`<div class="selected-row"><div><span class="selected-category">${escapeHTML(categoryName(item.category))}</span><strong>${escapeHTML(item.name)}</strong><small>${item.category==='stay'?`${money(item.price)} × ${state.hotelNights} ${t('nights')}`:money(item.price)}</small></div><strong class="selected-price">${money(item.price*(item.category==='stay'?state.hotelNights:1))}</strong><button class="remove-icon" onclick="removeItem('${item.category}','${item.id}')" aria-label="${t('remove')}">×</button></div>`).join('')}</div>`;
+}
+function itineraryScreen(){
+ return `${brandBar()}<main class="itinerary-page"><button class="back-link" onclick="goSeoulHome()">← SEOUL</button><div class="eyebrow">YOUR PERSONAL EDIT</div><h1>${t('itinerary')}<span class="title-period">.</span></h1><p class="lead">A flexible plan for your own dream weekend in Seoul.</p><section class="itinerary-summary"><div><span>${t('remaining')}</span><strong>${money(remaining())}</strong></div><div><span>${t('spent')}</span><strong>${money(spendTotal())}</strong></div><div><span>${t('selectedItems')}</span><strong>${state.selected.length}</strong></div></section>${selectedList()}<div class="itinerary-actions"><button class="gold-button" onclick="goSeoulHome()">＋ Add more places</button>${state.selected.length?`<button class="outline-button" onclick="clearItinerary()">${t('clear')}</button>`:''}</div><section class="suggestion-panel itinerary-suggestion"><div><div class="eyebrow">MAKE SEOUL BETTER</div><h2>${t('suggestionTitle')}</h2><p>${t('suggestionText')}</p></div><form class="suggestion-form" onsubmit="submitSuggestion(event)"><input id="suggestion-name" maxlength="100" placeholder="${t('name')}" required><textarea id="suggestion-details" maxlength="600" placeholder="${t('details')}"></textarea><button class="outline-button" type="submit">${t('submitSuggestion')} ↗</button></form></section></main>${noticeBar()}${footer()}`;
+}
 function shopScreen(){
-
-  const list = filtered();
-
-  return `
-
-    <div class="shop">
-
-      <div class="shopbar">
-
-        <div class="shopnav">
-
-          <div class="wordmark">
-            ${t("title")}
-          </div>
-
-          <input
-            class="search"
-            placeholder="${t("search")}"
-            value="${state.search.replaceAll('"','&quot;')}"
-            oninput="state.search=this.value;render()"
-          >
-
-          <div class="balance">
-            ${money(state.balance)}
-          </div>
-
-        </div>
-
-        <div class="categories">
-
-          ${
-            Object.keys(labels)
-              .map(c => `
-
-                <button
-                  class="cat ${state.category===c?'active':''}"
-                  onclick="state.category='${c}';render()"
-                >
-                  ${t(c)}
-                </button>
-
-              `)
-              .join("")
-          }
-
-        </div>
-
-      </div>
-
-
-      <div class="shop-heading">
-
-        <div>
-
-          <div class="eyebrow">
-            60 REAL-WORLD PICKS
-          </div>
-
-          <h1>
-            ${t("shopTitle")}
-          </h1>
-
-          <p>
-            ${t("shopSub")}
-          </p>
-
-        </div>
-
-        <button
-          class="lang-toggle"
-          onclick="setLang(state.lang==='en'?'ko':'en')"
-        >
-          ${state.lang==='en'?'🇰🇷 한국어':'🇬🇧 English'}
-        </button>
-
-      </div>
-
-
-      ${
-        list.length
-        ?
-        `<div class="grid">
-          ${list.map(productCard).join("")}
-        </div>`
-        :
-        `<div class="empty-shop">
-          ${t("empty")}
-        </div>`
-      }
-
-
-      ${cartDrawer()}
-
-    </div>
-
-  `;
+ const products=Array.isArray(window.DREAM_PRODUCTS)?window.DREAM_PRODUCTS:(Array.isArray(window.products)?window.products:[]);
+ let filtered=products.filter(p=>{
+  const name=String(p.name||p.title||'');
+  const category=String(p.category||'').toLowerCase();
+  const matchesCat=state.category==='all'||category===state.category;
+  const matchesSearch=!state.search||name.toLowerCase().includes(state.search.toLowerCase());
+  return matchesCat&&matchesSearch;
+ });
+ return `${brandBar()}<main class="category-page"><button class="back-link" onclick="backToDreamPicker()">← ${t('back')}</button><div class="eyebrow">THE DREAM EDIT</div><h1>${t('shopTitle')}</h1><p class="lead">A simulated shopping experience. No real purchases are made.</p><div class="shop-controls"><input placeholder="${t('search')}" value="${escapeHTML(state.search)}" oninput="updateSearch(this.value)"><select onchange="updateShopCategory(this.value)"><option value="all">${t('all')}</option>${['fashion','beauty','home','tech','travel','lifestyle'].map(c=>`<option value="${c}" ${state.category===c?'selected':''}>${c}</option>`).join('')}</select><button class="outline-button" onclick="showBag()">${t('bag')} (${state.cart.length})</button></div><div class="option-grid">${filtered.map((p,i)=>{const name=p.name||p.title||'Dream item';const price=Number(p.price||p.amount||0);const image=p.image||p.imageUrl||'';return `<article class="option-card"><div class="option-image-wrap">${image?`<img class="option-image" src="${escapeHTML(image)}" alt="${escapeHTML(name)}" onerror="this.style.display='none'">`:''}</div><div class="option-content"><div class="option-area">${escapeHTML(p.category||'Dream edit')}</div><h2>${escapeHTML(name)}</h2><p>${escapeHTML(p.description||'An item for your imaginary dream life.')}</p><div class="option-bottom"><strong>${money(price)}</strong><button class="outline-button" onclick="addToBag(${i},'${escapeHTML(name).replace(/'/g,"\\'")}',${price},'${escapeHTML(image)}')">${t('addCart')}</button></div></div></article>`;}).join('')||`<p>No matching products found. Check that products.js is loaded.</p>`}</div></main>${noticeBar()}${footer()}`;
+}
+function bagScreen(){
+ const total=state.cart.reduce((s,i)=>s+i.price*i.qty,0);
+ return `${brandBar()}<main class="itinerary-page"><button class="back-link" onclick="openShop()">← ${t('back')}</button><div class="eyebrow">YOUR DREAM BAG</div><h1>${t('bag')}</h1>${state.cart.length?`<div class="selected-list">${state.cart.map((i,n)=>`<div class="selected-row"><div><strong>${escapeHTML(i.name)}</strong><small>${money(i.price)} × ${i.qty}</small></div><strong>${money(i.price*i.qty)}</strong><button class="remove-icon" onclick="removeFromBag(${n})">×</button></div>`).join('')}</div><div class="itinerary-summary"><div><span>${t('total')}</span><strong>${money(total)}</strong></div></div><button class="gold-button" onclick="fakeCheckout()">${t('checkout')}</button>`:`<p>${t('emptyBag')}</p>`}</main>${noticeBar()}${footer()}`;
+}
+function render(){
+ const app=document.getElementById('app');
+ if(!app){console.error('Could not find #app element');return;}
+ if(!state.lang){app.innerHTML=languageScreen();return;}
+ if(!state.agreed){app.innerHTML=warningScreen();return;}
+ if(!state.drawn){app.innerHTML=ticketScreen();return;}
+ if(!state.dream){app.innerHTML=dreamPickerScreen();return;}
+ if(state.view==='itinerary'){app.innerHTML=itineraryScreen();return;}
+ if(state.view==='shop'){app.innerHTML=shopScreen();return;}
+ if(state.view==='bag'){app.innerHTML=bagScreen();return;}
+ if(state.destination==='seoul'){
+   if(state.view==='category'&&state.seoulPlanning){app.innerHTML=seoulCategoryScreen(state.seoulPlanning);return;}
+   app.innerHTML=seoulPlannerScreen();return;
+ }
+ if(state.destination){app.innerHTML=destinationScreen();return;}
+ app.innerHTML=destinationScreen();
 }
 
+// Main navigation actions
+function chooseLanguage(lang){state.lang=lang;localStorage.setItem('dreamLang',lang);render();}
+function changeLanguage(){state.lang=null;render();}
+function acceptWarning(){state.agreed=true;render();}
+function toggleNumber(n){state.lottoNumbers=state.lottoNumbers||[];if(state.lottoNumbers.includes(n)){state.lottoNumbers=state.lottoNumbers.filter(x=>x!==n);}else if(state.lottoNumbers.length<6){state.lottoNumbers.push(n);}render();}
+function quickPick(){const pool=Array.from({length:45},(_,i)=>i+1);state.lottoNumbers=[];while(state.lottoNumbers.length<6){const n=pool.splice(Math.floor(Math.random()*pool.length),1)[0];state.lottoNumbers.push(n);}state.lottoNumbers.sort((a,b)=>a-b);render();}
+function clearNumbers(){state.lottoNumbers=[];render();}
+function drawNumbers(){if((state.lottoNumbers||[]).length!==6)return;state.drawn=true;state.drawnNumbers=[...state.lottoNumbers].sort((a,b)=>a-b);render();}
+function chooseDream(choice){if(choice==='shop'){state.view='shop';render();return;}startDream();}
+function startDream(){state.dream=true;state.destination=null;state.view='main';render();}
+function selectDestination(destination){state.destination=destination;state.seoulPlanning=null;state.view='main';render();window.scrollTo(0,0);}
+function goSeoulHome(){state.destination='seoul';state.seoulPlanning=null;state.view='main';setNotice('');render();window.scrollTo(0,0);}
+function showItinerary(){state.view='itinerary';render();window.scrollTo(0,0);}
+function backToDreamPicker(){state.dream=false;state.view='main';state.destination=null;render();}
+function comingSoon(){setNotice(t('comingSoon'));render();}
+function restartApp(){if(confirm('Start the experience again? Your current itinerary will be cleared.')){state.agreed=false;state.drawn=false;state.dream=false;state.destination=null;state.seoulPlanning=null;state.view='main';state.selected=[];state.lottoNumbers=[];state.cart=[];state.balance=750000000;setNotice('');render();}}
 
-/* =========================================================
-   CART
-   ========================================================= */
-
-function addToCart(id){
-
-  const p =
-    PRODUCTS.find(x=>x.id===id);
-
-  if(!p){
-    return;
-  }
-
-  if(p.price > state.balance){
-
-    alert(
-      state.lang==='ko'
-      ? "잔액이 부족합니다."
-      : "You don't have enough fictional money."
-    );
-
-    return;
-  }
-
-  state.cart.push(p);
-
-  state.balance -= p.price;
-
-  render();
+// Seoul planner and shared budget
+function addItem(category,id){
+ const item=(SEOUL[category]||[]).find(x=>x.id===id);if(!item)return;
+ if(isSelected(category,id)){setNotice(t('already'));render();return;}
+ const cost=item.price*(category==='stay'?state.hotelNights:1);
+ if(cost>remaining()){setNotice(t('budgetLow'));render();return;}
+ state.selected.push({...item,category});setNotice(t('added'));render();
+}
+function removeItem(category,id){state.selected=state.selected.filter(item=>!(item.category===category&&item.id===id));setNotice(t('remove'));render();}
+function changeNights(delta){
+ const next=Math.max(1,Math.min(30,state.hotelNights+delta));
+ const hotel=state.selected.find(item=>item.category==='stay');
+ if(hotel&&hotel.price*next>state.balance-(spendTotal()-hotel.price*state.hotelNights)){setNotice(t('budgetLow'));render();return;}
+ state.hotelNights=next;render();
+}
+function clearItinerary(){if(confirm(t('confirmClear'))){state.selected=[];setNotice('');render();}}
+function submitSuggestion(event){
+ event.preventDefault();const name=document.getElementById('suggestion-name')?.value.trim()||'';const details=document.getElementById('suggestion-details')?.value.trim()||'';
+ if(!name){setNotice(t('emptyName'));render();return;}
+ const suggestion={id:uid(),name,details,status:'pending',createdAt:new Date().toISOString()};
+ state.suggestions.push(suggestion);try{localStorage.setItem('dreamSuggestions',JSON.stringify(state.suggestions));}catch(e){console.warn('Could not save suggestion locally',e);}
+ setNotice(t('pending'));render();
 }
 
-
-function cartDrawer(){
-
-  if(!state.cart.length){
-    return "";
-  }
-
-  const total =
-    state.cart.reduce(
-      (s,p)=>s+p.price,
-      0
-    );
-
-  return `
-
-    <div class="cart-drawer">
-
-      <div class="cart-head">
-
-        <strong>
-          ${t("cart")} ·
-          ${state.cart.length}${t("items")}
-        </strong>
-
-        <span>
-          ${money(state.balance)}
-        </span>
-
-      </div>
-
-
-      <div class="cart-items">
-
-        ${
-          state.cart
-            .map(p => `
-
-              <div class="cart-item">
-
-                <span>
-                  ${p.brand} ${p.name}
-                </span>
-
-                <strong>
-                  ${money(p.price)}
-                </strong>
-
-              </div>
-
-            `)
-            .join("")
-        }
-
-      </div>
-
-
-      <div class="cart-total">
-
-        <span>
-          ${t("total")}
-        </span>
-
-        <span>
-          ${money(total)}
-        </span>
-
-      </div>
-
-
-      <div class="cart-actions">
-
-        <button onclick="resetDream()">
-          ${t("reset")}
-        </button>
-
-        <button
-          class="checkout"
-          onclick="checkout()"
-        >
-          ${t("checkout")}
-        </button>
-
-      </div>
-
-    </div>
-
-  `;
+// Optional products.js shopping area; no real checkout or payment.
+function openShop(){state.view='shop';render();}
+function updateSearch(value){state.search=value;const cursor=window.getSelection?.();render();const input=document.querySelector('.shop-controls input');if(input){input.focus();input.setSelectionRange(value.length,value.length);}}
+function updateShopCategory(value){state.category=value;render();}
+function addToBag(index,name,price,image){
+ const products=Array.isArray(window.DREAM_PRODUCTS)?window.DREAM_PRODUCTS:(Array.isArray(window.products)?window.products:[]);
+ const product=products[index];const realName=product?.name||product?.title||name;const realPrice=Number(product?.price||product?.amount||price)||0;const realImage=product?.image||product?.imageUrl||image||'';
+ const existing=state.cart.find(i=>i.name===realName);if(existing)existing.qty++;else state.cart.push({name:realName,price:realPrice,image:realImage,qty:1});setNotice(t('added'));render();
 }
+function showBag(){state.view='bag';render();}
+function removeFromBag(index){state.cart.splice(index,1);render();}
+function fakeCheckout(){setNotice('Demo only: no payment was taken.');state.cart=[];state.view='shop';render();}
 
+// Make inline HTML handlers available when scripts are loaded as a module or strict script.
+Object.assign(window,{chooseLanguage,changeLanguage,acceptWarning,toggleNumber,quickPick,clearNumbers,drawNumbers,chooseDream,startDream,selectDestination,goSeoulHome,showItinerary,backToDreamPicker,comingSoon,restartApp,openCategory,addItem,removeItem,changeNights,clearItinerary,submitSuggestion,openShop,updateSearch,updateShopCategory,addToBag,showBag,removeFromBag,fakeCheckout,setNotice,render});
 
-function resetDream(){
-
-  state.balance = 750000000;
-  state.cart = [];
-
-  render();
-}
-
-
-/* =========================================================
-   CHECKOUT
-   ========================================================= */
-
-function checkout(){
-
-  const total =
-    state.cart.reduce(
-      (s,p)=>s+p.price,
-      0
-    );
-
-  const modal =
-    document.createElement("div");
-
-  modal.className = "receipt";
-
-
-  modal.innerHTML = `
-
-    <div class="receipt-card">
-
-      <div class="eyebrow">
-        THE LOTTERY
-      </div>
-
-      <h2>
-        ${t("receipt")}
-      </h2>
-
-      <p>
-        ${t("receiptText")}
-      </p>
-
-      ${
-        state.cart
-          .map(p => `
-
-            <div class="receipt-line">
-
-              <span>
-                ${p.brand} ${p.name}
-              </span>
-
-              <strong>
-                ${money(p.price)}
-              </strong>
-
-            </div>
-
-          `)
-          .join("")
-      }
-
-      <div class="receipt-line">
-
-        <strong>
-          ${t("total")}
-        </strong>
-
-        <strong>
-          ${money(total)}
-        </strong>
-
-      </div>
-
-      <p class="small">
-        ${t("remaining")}:
-        ${money(state.balance)}
-      </p>
-
-      <button
-        class="add"
-        onclick="this.closest('.receipt').remove()"
-      >
-        ${t("close")}
-      </button>
-
-    </div>
-
-  `;
-
-
-  document.body.appendChild(modal);
-}
-
-
-/* =========================================================
-   START APP
-   ========================================================= */
-
+// Initialise page. This file expects index.html to contain an element with id="app".
+if(!Array.isArray(state.lottoNumbers))state.lottoNumbers=[];
 render();
