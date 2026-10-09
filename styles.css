@@ -1618,6 +1618,7 @@ button,input{font:inherit}button{cursor:pointer}
    SEOUL EXPERIENCE
    ========================================================= */
 
+
 .seoul-hero {
   position: relative;
   min-height: 88vh;
@@ -1626,23 +1627,16 @@ button,input{font:inherit}button{cursor:pointer}
   align-items: center;
   justify-content: center;
   background:
-    radial-gradient(
-      circle at 70% 35%,
-      rgba(48, 76, 66, 0.42),
-      transparent 38%
-    ),
-    radial-gradient(
-      circle at 30% 65%,
-      rgba(140, 104, 55, 0.16),
-      transparent 35%
-    ),
     linear-gradient(
-      135deg,
-      #070909 0%,
-      #111917 48%,
-      #080a09 100%
-    );
+      rgba(7, 9, 9, 0.38),
+      rgba(7, 9, 9, 0.68)
+    ),
+    url("images/seoul-background.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
+
 
 .seoul-atmosphere {
   position: absolute;
