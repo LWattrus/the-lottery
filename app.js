@@ -769,7 +769,7 @@ function seoulPlannerScreen(){
 }
 
 function startSeoulPlanning(){
-  state.seoulPlanning = true;
+  state.seoulPlanning = "stay";
   render();
 }
 
